@@ -137,7 +137,7 @@ while running:
                     selected_option_index = (selected_option_index - 1) % len(current_options)
                 elif event.key == pygame.K_DOWN:
                     selected_option_index = (selected_option_index + 1) % len(current_options)
-                elif event.key == pygame.K_a or event.key == pygame.K_RETURN:  # A button or Enter for PC testing
+                elif event.key in (97, 98, pygame.K_RETURN):  # A and B keys
                     if selected_option_index == correct_answer_index:
                         feedback_text = "Correct!"
                         feedback_color = CORRECT_COLOR
