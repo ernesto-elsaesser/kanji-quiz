@@ -1,0 +1,12 @@
+dejavuserif
+notosanssc
+notosansjp
+notosanstc
+notosanshk
+notosanskr
+dejavusansmono
+dejavusans
+droidsansfallback
+nanumsquareac
+
+default: freesansbold.ttf
