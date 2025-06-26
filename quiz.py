@@ -15,7 +15,7 @@ SET_FILES = [
 
 BLACK = (0, 0, 0)
 WHITE = (200, 200, 200)
-RED = (200, 0, 0)
+RED = (255, 0, 0)
 
 ANSWER_KEYS = [
     pygame.K_UP,
@@ -75,16 +75,17 @@ class Game:
             try:
                 index = ANSWER_KEYS.index(key_code)
                 self.bad_keys = set()
+                if index == self.correct:
+                    self.next_question()
+                else:
+                    self.miss = index
+                self.draw_quiz()
+
             except ValueError:
                 self.bad_keys.add(key_code)
-                return len(self.bad_keys) < 4
-
-            if index == self.correct:
-                self.next_question()
-            else:
-                self.miss = index
-
-            self.draw_quiz()
+                if len(self.bad_keys) > 3:
+                    self.draw_end()
+                    return False
 
         return True
 
@@ -118,6 +119,14 @@ class Game:
             meaning = self.kanji_dict[option_kanji][0]
             color = RED if i == self.miss else WHITE
             self.draw_text(self.latin_font, meaning, color, *ANSWER_COORDS[i])
+
+        pygame.display.flip()
+
+    def draw_end(self):
+
+        self.screen.fill(BLACK)
+
+        self.draw_text(self.latin_font, "EXIT", RED, 0.5, 0.5)
 
         pygame.display.flip()
 
