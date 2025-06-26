@@ -1,107 +1,127 @@
-import csv
+import json
 import random
 import pygame
 
 
-KANJI_CSV = "kanjis.csv"
-BACKGROUND_COLOR = (0, 0, 0)
-TEXT_COLOR = (200, 200, 200)
-CORRECT_COLOR = (0, 200, 0)
-INCORRECT_COLOR = (200, 0, 0)
+SET_NAMES = [
+    "GRADE 1",
+    "GRADE 2",
+]
 
-DPAD_COORDS = {
-    pygame.K_UP: (0.5, 0.55),
-    pygame.K_LEFT: (0.3, 0.7),
-    pygame.K_RIGHT: (0.7, 0.7),
-    pygame.K_DOWN: (0.5, 0.85)
-}
+SET_FILES = [
+    "grade1.json",
+    "grade2.json",
+]
+
+BLACK = (0, 0, 0)
+WHITE = (200, 200, 200)
+RED = (200, 0, 0)
+
+ANSWER_KEYS = [
+    pygame.K_UP,
+    pygame.K_LEFT,
+    pygame.K_RIGHT,
+    pygame.K_DOWN
+]
+
+ANSWER_COORDS = [
+    (0.5, 0.55),
+    (0.45, 0.7, "r"),
+    (0.55, 0.7, "l"),
+    (0.5, 0.85)
+]
 
 
 class Game:
 
-    def __init__(self, width, height, latin_font, kanji_font):
+    def __init__(self, width, height, font_name, font_name_jp):
 
         self.screen = pygame.display.set_mode((width, height))
 
-        self.latin_font = latin_font
-        self.kanji_font = kanji_font
+        self.latin_font = pygame.font.SysFont(font_name, 32)
+        self.kanji_font = pygame.font.SysFont(font_name_jp, 128)
+        self.kana_font = pygame.font.SysFont(font_name_jp, 24)
 
-        self.labels = {
-            "1": "GRADE 1",
-            "2": "GRADE 2",
-            "3": "GRADE 3",
-            "4": "GRADE 4",
-        }
+        self.set_index = 0
 
-        self.options = ["1", "2", "3", "4"]
-        self.grade = None
-        self.correct = None
-        self.selected = None
-        self.debug = None
+        self.kanji_dict = {}
+        self.options = []
+        self.correct = -1
+        self.miss = -1
 
-        self.draw()
+        self.draw_menu()
 
     def press(self, key_code):
 
-        # self.debug = str(key_code)
+        if len(self.kanji_dict) == 0:
 
-        if self.grade is None:
-            if key_code not in DPAD_COORDS:
+            if key_code == pygame.K_LEFT:
+                if self.set_index > 0:
+                    self.set_index -= 1
+            elif key_code == pygame.K_RIGHT:
+                if self.set_index < len(SET_FILES) - 1:
+                    self.set_index += 1
+            elif key_code == pygame.K_DOWN:
+                with open(SET_FILES[self.set_index], encoding="utf-8") as f:
+                    self.kanji_dict = json.load(f)
+                self.options = random.sample(list(self.kanji_dict), 4)
+                self.correct = random.randrange(4)
+            else:
                 return
 
-            index = list(DPAD_COORDS).index(key_code)
-            self.grade = self.options[index]
-
-            self.labels = {}
-            with open(KANJI_CSV, encoding='utf-8') as f:
-                reader = csv.reader(f)
-                next(reader)
-                for index, kanji, kanji_old, radical, strokes, grade, year, meanings, on, kun, frequency, jlpt in reader:
-                    if grade == self.grade:
-                        self.labels[kanji] = meanings.upper()
-
-            self.options = random.sample(list(self.labels), 4)
-            self.correct = random.choice(self.options)
-
-        elif self.selected is None:
-            if key_code not in DPAD_COORDS:
-                return
-            self.selected = key_code
+            self.draw_menu()
 
         else:
-            self.options = random.sample(list(self.labels), 4)
-            self.correct = random.choice(self.options)
-            self.selected = None
 
-        self.draw()
+            try:
+                index = ANSWER_KEYS.index(key_code)
+            except ValueError:
+                return
 
-    def draw(self):
+            if index == self.correct:
+                self.options = random.sample(list(self.kanji_dict), 4)
+                self.correct = random.randrange(4)
+            else:
+                self.miss = index
 
-        self.screen.fill(BACKGROUND_COLOR)
+            self.draw_quiz()
 
-        self.draw_text(self.kanji_font, self.correct, TEXT_COLOR, 0.5, 0.25)
+    def draw_menu(self):
 
-        for key_code, option in zip(DPAD_COORDS, self.options):
-            option_color = TEXT_COLOR
-            if self.selected is not None:
-                if option == self.correct:
-                    option_color = CORRECT_COLOR
-                elif key_code == self.selected:
-                    option_color = INCORRECT_COLOR
+        self.screen.fill(BLACK)
 
-            self.draw_text(self.latin_font, self.labels[option],
-                           option_color, *DPAD_COORDS[key_code])
-
-        if self.debug is not None:
-            self.draw_text(self.latin_font, self.debug,
-                           INCORRECT_COLOR, 0.95, 0.05)
+        name = SET_NAMES[self.set_index]
+        self.draw_text(self.latin_font, name, WHITE, 0.5, 0.5)
 
         pygame.display.flip()
 
-    def draw_text(self, font, text, color, wp, hp):
+    def draw_quiz(self):
+
+        self.screen.fill(BLACK)
+
+        correct_kanji = self.options[self.correct]
+        self.draw_text(self.kanji_font, correct_kanji, WHITE, 0.25, 0.25)
+
+        _, on, kun = self.kanji_dict[correct_kanji]
+        self.draw_text(self.kana_font, on, WHITE, 0.5, 0.2, "l")
+        self.draw_text(self.kana_font, kun, WHITE, 0.5, 0.3, "l")
+
+        for i, option_kanji in enumerate(self.options):
+            meaning = self.kanji_dict[option_kanji][0]
+            color = RED if i == self.miss else WHITE
+            self.draw_text(self.latin_font, meaning, color, *ANSWER_COORDS[i])
+
+        pygame.display.flip()
+
+    def draw_text(self, font, text, color, wp, hp, anchor=None):
 
         x = self.screen.get_width() * wp
         y = self.screen.get_height() * hp
         text_surface = font.render(text, True, color)
-        rect = text_surface.get_rect(center=(x, y))
+        if anchor == "l":
+            rect = text_surface.get_rect(midleft=(x, y))
+        elif anchor == "r":
+            rect = text_surface.get_rect(midright=(x, y))
+        else:
+            rect = text_surface.get_rect(center=(x, y))
         self.screen.blit(text_surface, rect)
