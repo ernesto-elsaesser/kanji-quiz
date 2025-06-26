@@ -1,5 +1,5 @@
 TARGET_DIR="/Volumes/SHARE/roms/pygame/quiz"
 mkdir -p "$TARGET_DIR"
-cp kanjis.csv "$TARGET_DIR/kanjis.csv"
+cp *.json "$TARGET_DIR"
 cp quiz.py "$TARGET_DIR/quiz.py"
 cp main.py "$TARGET_DIR/kanji-quiz.pygame"
