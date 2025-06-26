@@ -1,0 +1,5 @@
+TARGET_DIR="/Volumes/SHARE/roms/pygame/quiz"
+mkdir -p "$TARGET_DIR"
+cp kanji.json "$TARGET_DIR/kanji.json"
+cp quiz.py "$TARGET_DIR/quiz.py"
+cp console.py "$TARGET_DIR/kanji-quiz.pygame"
