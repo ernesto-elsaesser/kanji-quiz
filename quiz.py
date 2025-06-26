@@ -58,18 +58,17 @@ class Game:
             if key_code == pygame.K_LEFT:
                 if self.set_index > 0:
                     self.set_index -= 1
+                self.draw_menu()
             elif key_code == pygame.K_RIGHT:
                 if self.set_index < len(SET_FILES) - 1:
                     self.set_index += 1
+                self.draw_menu()
             elif key_code == pygame.K_DOWN:
                 with open(SET_FILES[self.set_index], encoding="utf-8") as f:
                     self.kanji_dict = json.load(f)
                 self.options = random.sample(list(self.kanji_dict), 4)
                 self.correct = random.randrange(4)
-            else:
-                return
-
-            self.draw_menu()
+                self.draw_quiz()
 
         else:
 
@@ -100,11 +99,11 @@ class Game:
         self.screen.fill(BLACK)
 
         correct_kanji = self.options[self.correct]
-        self.draw_text(self.kanji_font, correct_kanji, WHITE, 0.25, 0.25)
+        self.draw_text(self.kanji_font, correct_kanji, WHITE, 0.2, 0.25)
 
         _, on, kun = self.kanji_dict[correct_kanji]
-        self.draw_text(self.kana_font, on, WHITE, 0.5, 0.2, "l")
-        self.draw_text(self.kana_font, kun, WHITE, 0.5, 0.3, "l")
+        self.draw_text(self.kana_font, on, WHITE, 0.35, 0.2, "l")
+        self.draw_text(self.kana_font, kun, WHITE, 0.35, 0.3, "l")
 
         for i, option_kanji in enumerate(self.options):
             meaning = self.kanji_dict[option_kanji][0]

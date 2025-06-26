@@ -1,13 +1,16 @@
+import sys
 import pygame
 import quiz
 
 
-pygame.init()
-
-installed_fonts = pygame.font.get_fonts()
-font_name = "consolas" if "consolas" in installed_fonts else "dejavusansmono"
+font_name = "dejavusansmono"
 font_name_jp = "notosansjp"
 
+if len(sys.argv) == 3:
+    font_name = sys.argv[1]
+    font_name_jp = sys.argv[2]
+
+pygame.init()
 game = quiz.Game(640, 480, font_name, font_name_jp)
 
 running = True
