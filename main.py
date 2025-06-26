@@ -17,10 +17,7 @@ running = True
 while running:
     for event in pygame.event.get():
         if event.type == pygame.KEYDOWN:
-            if event.key in (pygame.K_ESCAPE, 104):  # MENU
-                running = False
-            else:
-                game.press(event.key)
+            running = game.press(event.key)
 
     pygame.time.Clock().tick(60)
 

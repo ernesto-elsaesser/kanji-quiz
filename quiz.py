@@ -48,6 +48,8 @@ class Game:
         self.correct = -1
         self.miss = -1
 
+        self.bad_keys = set()
+
         self.draw_menu()
 
     def press(self, key_code):
@@ -72,8 +74,10 @@ class Game:
 
             try:
                 index = ANSWER_KEYS.index(key_code)
+                self.bad_keys = set()
             except ValueError:
-                return
+                self.bad_keys.add(key_code)
+                return len(self.bad_keys) < 4
 
             if index == self.correct:
                 self.next_question()
@@ -81,6 +85,8 @@ class Game:
                 self.miss = index
 
             self.draw_quiz()
+
+        return True
 
     def next_question(self):
 
