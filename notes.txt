@@ -1,16 +1,16 @@
 KEYS:
 
-13 = START
-32 = SELECT
-97 = A 
-98 = B
-104 = MENU
-108 = L1
-109 = L2
-114 = R1
-115 = R2
-120 = X
-121 = Y
+13 = START (K_RETURN)
+32 = SELECT (K_SPACE)
+97 = A (K_a)
+98 = B (K_b)
+104 = MENU (K_h)
+108 = L1 (K_l)
+109 = L2 (K_m)
+114 = R1 (K_r)
+115 = R2 (K_s)
+120 = X (K_x)
+121 = Y (K_y)
 
 FONTS:
 

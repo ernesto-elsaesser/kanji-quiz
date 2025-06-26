@@ -31,6 +31,12 @@ ANSWER_COORDS = [
     (0.5, 0.85)
 ]
 
+END_KEYS = {
+    pygame.K_h,  # MENU
+    pygame.K_l,  # L1
+    pygame.K_r,  # L2
+}
+
 
 class Game:
 
@@ -83,7 +89,7 @@ class Game:
 
             except ValueError:
                 self.bad_keys.add(key_code)
-                if len(self.bad_keys) > 3:
+                if self.bad_keys == END_KEYS:
                     self.draw_end()
                     return False
 
