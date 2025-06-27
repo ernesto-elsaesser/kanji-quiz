@@ -14,7 +14,7 @@ SET_FILES = [
 ]
 
 BLACK = (0, 0, 0)
-WHITE = (200, 200, 200)
+WHITE = (255, 255, 180)
 RED = (255, 0, 0)
 
 ANSWER_KEYS = [
@@ -89,7 +89,7 @@ class Game:
 
             except ValueError:
                 self.bad_keys.add(key_code)
-                if self.bad_keys == END_KEYS:
+                if key_code == pygame.K_ESCAPE or self.bad_keys == END_KEYS:
                     self.draw_end()
                     return False
 
