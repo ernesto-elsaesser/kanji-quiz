@@ -1,20 +1,26 @@
-import sys
 import pygame
 import quiz
 
 
-font_name = "dejavusansmono"
-font_name_jp = "notosansjp"
+LATIN_FONTS = ["dejavusansmono", "consolas", "sfnsmono", "dejavusans"]
+KANJI_FONTS = ["notosansjp", "hiraginosansgb"]
 
-if len(sys.argv) == 3:
-    font_name = sys.argv[1]
-    font_name_jp = sys.argv[2]
-
-sets = {f"GRADE {i}": f"grade{i}.json" for i in range(1, 7)}
+KANJI_SETS = {
+    "GRADE 1": "grade1.json",
+    "GRADE 2": "grade2.json",
+    "GRADE 3": "grade3.json",
+    "GRADE 4": "grade4.json",
+    "GRADE 5": "grade5.json",
+    "GRADE 6": "grade6.json",
+}
 
 pygame.init()
 
-game = quiz.Game(640, 480, font_name, font_name_jp, sets)
+installed_fonts = pygame.font.get_fonts()
+font_name = [n for n in LATIN_FONTS if n in installed_fonts][0]
+font_name_jp = [n for n in KANJI_FONTS if n in installed_fonts][0]
+
+game = quiz.Game(640, 480, font_name, font_name_jp, KANJI_SETS)
 game.run()
 
 pygame.quit()
