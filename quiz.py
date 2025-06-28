@@ -16,10 +16,10 @@ ANSWER_KEYS = [
 ]
 
 ANSWER_COORDS = [
-    (0.5, 0.55),
-    (0.45, 0.7, "r"),
-    (0.55, 0.7, "l"),
-    (0.5, 0.85)
+    (0.5, 0.53),
+    (0.43, 0.68, "r"),
+    (0.57, 0.68, "l"),
+    (0.5, 0.83)
 ]
 
 END_KEYS = {
@@ -127,6 +127,8 @@ class Game:
         self.draw_text(self.kana_font, on, WHITE, 0.4, 0.2, "l")
         self.draw_text(self.kana_font, kun, WHITE, 0.4, 0.3, "l")
 
+        self.draw_text(self.meaning_font, "+", WHITE, 0.5, 0.68)
+
         for i, option_kanji in enumerate(self.options):
             meaning = self.kanji_dict[option_kanji][0].upper()
             color = WHITE
@@ -144,7 +146,7 @@ class Game:
 
         self.screen.fill(BLACK)
 
-        self.draw_text(self.menu_font, "EXIT", WHITE, 0.5, 0.5)
+        self.draw_text(self.menu_font, "BYE", WHITE, 0.5, 0.5)
 
         pygame.display.flip()
 
