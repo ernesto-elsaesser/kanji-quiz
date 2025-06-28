@@ -13,14 +13,8 @@ if len(sys.argv) == 3:
 sets = {f"GRADE {i}": f"grade{i}.json" for i in range(1, 7)}
 
 pygame.init()
+
 game = quiz.Game(640, 480, font_name, font_name_jp, sets)
-
-running = True
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.KEYDOWN:
-            running = game.press(event.key)
-
-    pygame.time.Clock().tick(60)
+game.run()
 
 pygame.quit()

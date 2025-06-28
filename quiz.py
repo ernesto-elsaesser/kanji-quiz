@@ -5,7 +5,8 @@ import pygame
 
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 200)
-RED = (255, 100, 10)
+RED = (255, 0, 0)
+GREEN = (0, 255, 0)
 
 ANSWER_KEYS = [
     pygame.K_UP,
@@ -46,55 +47,65 @@ class Game:
         self.kanji_dict = {}
         self.options = []
         self.correct = -1
-        self.miss = -1
+        self.selected = None
+        self.frames_to_next = None
 
         self.bad_keys = set()
 
         self.draw_menu()
 
-    def press(self, key_code):
+    def run(self):
 
-        if len(self.kanji_dict) == 0:
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
 
-            if key_code == pygame.K_LEFT:
-                if self.set_index > 0:
-                    self.set_index -= 1
-                self.draw_menu()
-            elif key_code == pygame.K_RIGHT:
-                if self.set_index < len(self.set_names) - 1:
-                    self.set_index += 1
-                self.draw_menu()
-            elif key_code == pygame.K_DOWN:
-                set_file = self.set_files[self.set_names[self.set_index]]
-                with open(set_file, encoding="utf-8") as f:
-                    self.kanji_dict = json.load(f)
-                self.next_question()
-                self.draw_quiz()
+                    if len(self.kanji_dict) == 0:
 
-        else:
+                        if event.key == pygame.K_LEFT:
+                            if self.set_index > 0:
+                                self.set_index -= 1
+                            self.draw_menu()
+                        elif event.key == pygame.K_RIGHT:
+                            if self.set_index < len(self.set_names) - 1:
+                                self.set_index += 1
+                            self.draw_menu()
+                        elif event.key == pygame.K_DOWN:
+                            set_file = self.set_files[self.set_names[self.set_index]]
+                            with open(set_file, encoding="utf-8") as f:
+                                self.kanji_dict = json.load(f)
+                            self.next_question()
+                            self.draw_quiz()
 
-            try:
-                index = ANSWER_KEYS.index(key_code)
-                self.bad_keys = set()
-                if index == self.correct:
+                    else:
+
+                        try:
+                            self.selected = ANSWER_KEYS.index(event.key)
+                            self.draw_quiz()
+                            if self.selected == self.correct:
+                                self.frames_to_next = 4
+                            self.bad_keys = set()
+
+                        except ValueError:
+                            self.bad_keys.add(event.key)
+                            if event.key == pygame.K_ESCAPE or self.bad_keys == END_KEYS:
+                                self.draw_end()
+                                return
+
+            if self.frames_to_next is not None:
+                if self.frames_to_next == 0:
                     self.next_question()
+                    self.draw_quiz()
+                    self.frames_to_next = None
                 else:
-                    self.miss = index
-                self.draw_quiz()
-
-            except ValueError:
-                self.bad_keys.add(key_code)
-                if key_code == pygame.K_ESCAPE or self.bad_keys == END_KEYS:
-                    self.draw_end()
-                    return False
-
-        return True
+                    self.frames_to_next -= 1
+            pygame.time.Clock().tick(10)
 
     def next_question(self):
 
         self.options = random.sample(list(self.kanji_dict), 4)
         self.correct = random.randrange(4)
-        self.miss = -1
+        self.selected = None
 
     def draw_menu(self):
 
@@ -118,7 +129,12 @@ class Game:
 
         for i, option_kanji in enumerate(self.options):
             meaning = self.kanji_dict[option_kanji][0].upper()
-            color = RED if i == self.miss else WHITE
+            color = WHITE
+            if i == self.selected:
+                if i == self.correct:
+                    color = GREEN
+                else:
+                    color = RED
             self.draw_text(self.meaning_font, meaning,
                            color, *ANSWER_COORDS[i])
 
@@ -128,7 +144,7 @@ class Game:
 
         self.screen.fill(BLACK)
 
-        self.draw_text(self.menu_font, "EXIT", RED, 0.5, 0.5)
+        self.draw_text(self.menu_font, "EXIT", WHITE, 0.5, 0.5)
 
         pygame.display.flip()
 
