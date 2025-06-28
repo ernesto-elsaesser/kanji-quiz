@@ -4,8 +4,8 @@ import pygame
 
 
 BLACK = (0, 0, 0)
-WHITE = (255, 255, 180)
-RED = (255, 0, 0)
+WHITE = (255, 255, 200)
+RED = (255, 100, 10)
 
 ANSWER_KEYS = [
     pygame.K_UP,
@@ -34,8 +34,9 @@ class Game:
 
         self.screen = pygame.display.set_mode((width, height))
 
-        self.latin_font = pygame.font.SysFont(font_name, 30)
-        self.kanji_font = pygame.font.SysFont(font_name_jp, 130)
+        self.menu_font = pygame.font.SysFont(font_name, 60)
+        self.meaning_font = pygame.font.SysFont(font_name, 35)
+        self.kanji_font = pygame.font.SysFont(font_name_jp, 125)
         self.kana_font = pygame.font.SysFont(font_name_jp, 30)
 
         self.set_files = sets
@@ -100,7 +101,7 @@ class Game:
         self.screen.fill(BLACK)
 
         set_name = self.set_names[self.set_index]
-        self.draw_text(self.latin_font, set_name, WHITE, 0.5, 0.5)
+        self.draw_text(self.menu_font, set_name, WHITE, 0.5, 0.5)
 
         pygame.display.flip()
 
@@ -118,7 +119,8 @@ class Game:
         for i, option_kanji in enumerate(self.options):
             meaning = self.kanji_dict[option_kanji][0].upper()
             color = RED if i == self.miss else WHITE
-            self.draw_text(self.latin_font, meaning, color, *ANSWER_COORDS[i])
+            self.draw_text(self.meaning_font, meaning,
+                           color, *ANSWER_COORDS[i])
 
         pygame.display.flip()
 
@@ -126,7 +128,7 @@ class Game:
 
         self.screen.fill(BLACK)
 
-        self.draw_text(self.latin_font, "EXIT", RED, 0.5, 0.5)
+        self.draw_text(self.menu_font, "EXIT", RED, 0.5, 0.5)
 
         pygame.display.flip()
 

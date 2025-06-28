@@ -10,7 +10,7 @@ for grade_num in range(1, 7):
 
     kanji_dict = {}
     for index, kanji, kanji_old, radical, strokes, grade, year, meanings, on, kun, frequency, jlpt in rows:
-        if int(grade) != grade_num:
+        if grade != str(grade_num):
             continue
         meaning = meanings.split("|")[0]
         ons = "、".join(on.split("|")[:3])
