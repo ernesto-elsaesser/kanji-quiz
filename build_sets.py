@@ -28,6 +28,8 @@ for grade_num in range(1, 7):
             continue
         meanings = meanings.split(" (")[0]
         meaning = meanings.split("|")[0]
+        if meaning in SKIP:
+            continue
         meaning = MODS.get(meaning, meaning)
         ons = "、".join(on.split("|")[:3])
         kuns = "、".join(kun.split("|")[:3])
