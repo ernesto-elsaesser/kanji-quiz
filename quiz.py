@@ -4,7 +4,7 @@ import pygame
 
 
 BLACK = (0, 0, 0)
-WHITE = (200, 200, 150)
+WHITE = (200, 200, 165)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 
