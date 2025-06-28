@@ -3,16 +3,6 @@ import random
 import pygame
 
 
-SET_NAMES = [
-    "GRADE 1",
-    "GRADE 2",
-]
-
-SET_FILES = [
-    "grade1.json",
-    "grade2.json",
-]
-
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 180)
 RED = (255, 0, 0)
@@ -40,13 +30,16 @@ END_KEYS = {
 
 class Game:
 
-    def __init__(self, width, height, font_name, font_name_jp):
+    def __init__(self, width, height, font_name, font_name_jp, sets):
 
         self.screen = pygame.display.set_mode((width, height))
 
-        self.latin_font = pygame.font.SysFont(font_name, 32)
-        self.kanji_font = pygame.font.SysFont(font_name_jp, 128)
-        self.kana_font = pygame.font.SysFont(font_name_jp, 24)
+        self.latin_font = pygame.font.SysFont(font_name, 30)
+        self.kanji_font = pygame.font.SysFont(font_name_jp, 130)
+        self.kana_font = pygame.font.SysFont(font_name_jp, 30)
+
+        self.set_files = sets
+        self.set_names = list(sets)
 
         self.set_index = 0
         self.kanji_dict = {}
@@ -67,11 +60,12 @@ class Game:
                     self.set_index -= 1
                 self.draw_menu()
             elif key_code == pygame.K_RIGHT:
-                if self.set_index < len(SET_FILES) - 1:
+                if self.set_index < len(self.set_names) - 1:
                     self.set_index += 1
                 self.draw_menu()
             elif key_code == pygame.K_DOWN:
-                with open(SET_FILES[self.set_index], encoding="utf-8") as f:
+                set_file = self.set_files[self.set_names[self.set_index]]
+                with open(set_file, encoding="utf-8") as f:
                     self.kanji_dict = json.load(f)
                 self.next_question()
                 self.draw_quiz()
@@ -105,8 +99,8 @@ class Game:
 
         self.screen.fill(BLACK)
 
-        name = SET_NAMES[self.set_index]
-        self.draw_text(self.latin_font, name, WHITE, 0.5, 0.5)
+        set_name = self.set_names[self.set_index]
+        self.draw_text(self.latin_font, set_name, WHITE, 0.5, 0.5)
 
         pygame.display.flip()
 
@@ -122,7 +116,7 @@ class Game:
         self.draw_text(self.kana_font, kun, WHITE, 0.4, 0.3, "l")
 
         for i, option_kanji in enumerate(self.options):
-            meaning = self.kanji_dict[option_kanji][0]
+            meaning = self.kanji_dict[option_kanji][0].upper()
             color = RED if i == self.miss else WHITE
             self.draw_text(self.latin_font, meaning, color, *ANSWER_COORDS[i])
 

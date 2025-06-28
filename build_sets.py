@@ -6,13 +6,16 @@ with open("jouyou.csv", encoding='utf-8') as f:
     next(reader)
     rows = list(reader)
 
-for set_grade in ["1", "2"]:
+for grade_num in range(1, 7):
 
     kanji_dict = {}
     for index, kanji, kanji_old, radical, strokes, grade, year, meanings, on, kun, frequency, jlpt in rows:
-        if grade == set_grade:
-            kanji_dict[kanji] = (meanings.upper(), on.replace("|", "、"),
-                                 kun.replace("|", "、"))
+        if int(grade) != grade_num:
+            continue
+        meaning = meanings.split("|")[0]
+        ons = "、".join(on.split("|")[:3])
+        kuns = "、".join(kun.split("|")[:3])
+        kanji_dict[kanji] = (meaning, ons, kuns)
 
-    with open(f"grade{set_grade}.json", "w", encoding="utf-8") as f:
+    with open(f"grade{grade_num}.json", "w", encoding="utf-8") as f:
         json.dump(kanji_dict, f, indent=4, ensure_ascii=False)
