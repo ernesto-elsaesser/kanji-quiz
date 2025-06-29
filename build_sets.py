@@ -26,10 +26,11 @@ with open("kanji.csv", encoding='utf-8') as f:
 with open("hanzi.csv", encoding='utf-8') as f:
     reader = csv.reader(f)
     next(reader)
-    for rank, char, pinyin, pinyin_no_accents, meaning, alternative, alternative2, trad1, trad2 in reader:
-        info = kanjis.get(char[0])
-        if info is not None:
-            info["pinyins"].append(pinyin)
+    for rank, char, pinyin, pinyin_no_accents, meaning, alt, alt2, trad1, trad2 in reader:
+        for kanji in (char[0], alt, alt2, trad1, trad2):
+            info = kanjis.get(kanji)
+            if info is not None:
+                info["pinyins"].append(pinyin)
 
 
 os.makedirs("sets", exist_ok=True)
