@@ -12,15 +12,22 @@ GREEN = (0, 255, 0)
 
 class Game:
 
-    def __init__(self, width, height, font_name, font_name_jp, sets):
+    def __init__(self, width, height, latin_fonts, japan_fonts, sets):
 
         self.screen = pygame.display.set_mode((width, height))
 
+        self.msg_font = pygame.font.SysFont(None, 50)
+        self.message("LOADING")
+
+        font_names = pygame.font.get_fonts()
+        font_name = [n for n in latin_fonts if n in font_names][0]
+        font_name_jp = [n for n in japan_fonts if n in font_names][0]
+
         self.menu_font = pygame.font.SysFont(font_name, 60)
         self.meaning_font = pygame.font.SysFont(font_name, 35)
+        self.pinyin_font = pygame.font.SysFont(font_name, 28)
         self.kanji_font = pygame.font.SysFont(font_name_jp, 135)
         self.kana_font = pygame.font.SysFont(font_name_jp, 28)
-        self.pinyin_font = pygame.font.SysFont(font_name, 28)
 
         self.set_files = sets
         self.set_names = list(sets)
@@ -44,7 +51,7 @@ class Game:
                         self.function_pressed = True
                     elif event.key == pygame.K_RETURN:
                         if self.function_pressed:
-                            self.draw_end()
+                            self.message("BYE")
                             return
                     elif event.key == pygame.K_ESCAPE:
                         return
@@ -167,10 +174,10 @@ class Game:
 
         pygame.display.flip()
 
-    def draw_end(self):
+    def message(self, text):
 
         self.screen.fill(BLACK)
-        self.draw_text(self.menu_font, "BYE", WHITE, 0.5, 0.5)
+        self.draw_text(self.msg_font, text, WHITE, 0.5, 0.5)
         pygame.display.flip()
 
     def draw_text(self, font, text, color, wp, hp, anchor=None):
