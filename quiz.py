@@ -30,8 +30,7 @@ class Game:
         self.questions = None
         self.selected = None
         self.frames_to_next = None
-
-        self.bad_keys = set()
+        self.function_pressed = False
 
         self.draw()
 
@@ -42,7 +41,7 @@ class Game:
                 if event.type == pygame.KEYDOWN:
 
                     if event.key == pygame.K_h:
-                        self.function_pressed = False
+                        self.function_pressed = True
                     elif event.key == pygame.K_RETURN:
                         if self.function_pressed:
                             self.draw_end()
@@ -78,7 +77,8 @@ class Game:
                     self.draw()
 
                 elif event.type == pygame.KEYUP:
-                    self.function_pressed = False
+                    if event.key == pygame.K_h:
+                        self.function_pressed = False
 
             if self.frames_to_next is not None:
                 if self.frames_to_next == 0:
