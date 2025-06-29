@@ -8,12 +8,6 @@ WHITE = (200, 200, 200)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 
-END_KEYS = {
-    pygame.K_h,  # MENU
-    pygame.K_l,  # L1
-    pygame.K_r,  # L2
-}
-
 
 class Game:
 
@@ -46,8 +40,6 @@ class Game:
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
 
-                    unmapped = False
-
                     if self.questions is None:
 
                         if event.key == pygame.K_LEFT:
@@ -58,8 +50,6 @@ class Game:
                                 self.set_index += 1
                         elif event.key == pygame.K_a:
                             self.load_set()
-                        else:
-                            unmapped = True
 
                     else:
 
@@ -71,19 +61,9 @@ class Game:
                             self.selected = 2
                         if event.key == pygame.K_b:
                             self.selected = 3
-                        else:
-                            unmapped = True
 
                         if self.selected == self.questions[0][1]:
                             self.frames_to_next = 4
-
-                    if unmapped:
-                        self.bad_keys.add(event.key)
-                        if event.key == pygame.K_ESCAPE or self.bad_keys == END_KEYS:
-                            self.draw_end()
-                            return
-                    else:
-                        self.bad_keys = set()
 
                     self.draw()
 
@@ -161,14 +141,6 @@ class Game:
                         color = RED
                 self.draw_text(self.meaning_font, meaning,
                                color, *answer_coords[i])
-
-        pygame.display.flip()
-
-    def draw_end(self):
-
-        self.screen.fill(BLACK)
-
-        self.draw_text(self.menu_font, "BYE", WHITE, 0.5, 0.5)
 
         pygame.display.flip()
 
