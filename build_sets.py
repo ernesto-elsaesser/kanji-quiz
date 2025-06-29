@@ -27,6 +27,8 @@ with open("hanzi.csv", encoding='utf-8') as f:
     reader = csv.reader(f)
     next(reader)
     for rank, char, pinyin, pinyin_no_accents, meaning, alt, alt2, trad1, trad2 in reader:
+        if pinyin[0].isupper():
+            continue
         for kanji in (char[0], alt, alt2, trad1, trad2):
             info = kanjis.get(kanji)
             if info is not None:
