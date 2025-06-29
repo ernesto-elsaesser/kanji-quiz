@@ -5,6 +5,7 @@ import pygame
 
 BLACK = (0, 0, 0)
 WHITE = (200, 200, 200)
+DIM_WHITE = (175, 175, 175)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 
@@ -134,7 +135,7 @@ class Game:
             kun = "、".join(info["kuns"][:3])
             pinyin = ", ".join(info["pinyins"][:3])
 
-            self.draw_text(self.pinyin_font, pinyin, WHITE, 0.4, 0.15, "l")
+            self.draw_text(self.pinyin_font, pinyin, DIM_WHITE, 0.4, 0.15, "l")
             self.draw_text(self.kana_font, on, WHITE, 0.4, 0.25, "l")
             self.draw_text(self.kana_font, kun, WHITE, 0.4, 0.35, "l")
 
