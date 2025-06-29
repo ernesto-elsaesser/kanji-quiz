@@ -5,7 +5,7 @@ import pygame
 
 BLACK = (0, 0, 0)
 WHITE = (200, 200, 200)
-DIM_WHITE = (175, 175, 175)
+DIM_WHITE = (150, 150, 150)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 
