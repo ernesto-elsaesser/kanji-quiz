@@ -132,7 +132,7 @@ class Game:
             info = self.kanji_dict[correct_kanji]
             on = "、".join(info["ons"][:3])
             kun = "、".join(info["kuns"][:3])
-            pinyin = info["pinyin"]
+            pinyin = ", ".join(info["pinyins"][:3])
 
             self.draw_text(self.pinyin_font, pinyin, WHITE, 0.4, 0.15, "l")
             self.draw_text(self.kana_font, on, WHITE, 0.4, 0.25, "l")
