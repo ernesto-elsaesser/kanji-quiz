@@ -57,10 +57,12 @@ class Game:
                         elif event.key == pygame.K_RIGHT:
                             if self.set_index < len(self.set_names) - 1:
                                 self.set_index += 1
-                        elif event.key in {pygame.K_a, pygame.K_RETURN}:
+                        elif event.key == pygame.K_RETURN:
                             self.load_set()
 
                     else:
+
+                        correct = self.questions[0][1]
 
                         if event.key in {pygame.K_x, pygame.K_UP}:
                             self.selected = 2
@@ -70,8 +72,10 @@ class Game:
                             self.selected = 0
                         if event.key in {pygame.K_b, pygame.K_DOWN}:
                             self.selected = 3
+                        if event.key == pygame.K_RETURN:
+                            self.questions = None
 
-                        if self.selected == self.questions[0][1]:
+                        if self.selected == correct:
                             self.frames_to_next = 4
 
                     self.draw()
