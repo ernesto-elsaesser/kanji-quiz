@@ -4,23 +4,9 @@ import pygame
 
 
 BLACK = (0, 0, 0)
-WHITE = (200, 200, 165)
+WHITE = (200, 200, 200)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
-
-ANSWER_KEYS = [
-    pygame.K_UP,
-    pygame.K_LEFT,
-    pygame.K_RIGHT,
-    pygame.K_DOWN
-]
-
-ANSWER_COORDS = [
-    (0.5, 0.53),
-    (0.43, 0.68, "r"),
-    (0.57, 0.68, "l"),
-    (0.5, 0.83)
-]
 
 END_KEYS = {
     pygame.K_h,  # MENU
@@ -37,22 +23,22 @@ class Game:
 
         self.menu_font = pygame.font.SysFont(font_name, 60)
         self.meaning_font = pygame.font.SysFont(font_name, 35)
-        self.kanji_font = pygame.font.SysFont(font_name_jp, 125)
-        self.kana_font = pygame.font.SysFont(font_name_jp, 30)
+        self.kanji_font = pygame.font.SysFont(font_name_jp, 130)
+        self.kana_font = pygame.font.SysFont(font_name_jp, 28)
+        self.pinyin_font = pygame.font.SysFont(font_name, 28)
 
         self.set_files = sets
         self.set_names = list(sets)
 
         self.set_index = 0
         self.kanji_dict = {}
-        self.options = []
-        self.correct = -1
+        self.questions = None
         self.selected = None
         self.frames_to_next = None
 
         self.bad_keys = set()
 
-        self.draw_menu()
+        self.draw()
 
     def run(self):
 
@@ -60,85 +46,121 @@ class Game:
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
 
-                    if len(self.kanji_dict) == 0:
+                    unmapped = False
+
+                    if self.questions is None:
 
                         if event.key == pygame.K_LEFT:
                             if self.set_index > 0:
                                 self.set_index -= 1
-                            self.draw_menu()
                         elif event.key == pygame.K_RIGHT:
                             if self.set_index < len(self.set_names) - 1:
                                 self.set_index += 1
-                            self.draw_menu()
-                        elif event.key == pygame.K_DOWN:
-                            set_file = self.set_files[self.set_names[self.set_index]]
-                            with open(set_file, encoding="utf-8") as f:
-                                self.kanji_dict = json.load(f)
-                            self.next_question()
-                            self.draw_quiz()
+                        elif event.key == pygame.K_a:
+                            self.load_set()
+                        else:
+                            unmapped = True
 
                     else:
 
-                        try:
-                            self.selected = ANSWER_KEYS.index(event.key)
-                            self.draw_quiz()
-                            if self.selected == self.correct:
-                                self.frames_to_next = 4
-                            self.bad_keys = set()
+                        if event.key == pygame.K_x:
+                            self.selected = 0
+                        if event.key == pygame.K_y:
+                            self.selected = 1
+                        if event.key == pygame.K_a:
+                            self.selected = 2
+                        if event.key == pygame.K_b:
+                            self.selected = 3
+                        else:
+                            unmapped = True
 
-                        except ValueError:
-                            self.bad_keys.add(event.key)
-                            if event.key == pygame.K_ESCAPE or self.bad_keys == END_KEYS:
-                                self.draw_end()
-                                return
+                        if self.selected == self.questions[0][1]:
+                            self.frames_to_next = 4
+
+                    if unmapped:
+                        self.bad_keys.add(event.key)
+                        if event.key == pygame.K_ESCAPE or self.bad_keys == END_KEYS:
+                            self.draw_end()
+                            return
+                    else:
+                        self.bad_keys = set()
+
+                    self.draw()
 
             if self.frames_to_next is not None:
                 if self.frames_to_next == 0:
-                    self.next_question()
-                    self.draw_quiz()
                     self.frames_to_next = None
+                    self.selected = None
+                    assert self.questions is not None
+                    self.questions.pop(0)
+                    if len(self.questions) == 0:
+                        self.questions = None
+                    self.draw()
                 else:
                     self.frames_to_next -= 1
+
             pygame.time.Clock().tick(10)
 
-    def next_question(self):
+    def load_set(self):
 
-        self.options = random.sample(list(self.kanji_dict), 4)
-        self.correct = random.randrange(4)
-        self.selected = None
+        set_file = self.set_files[self.set_names[self.set_index]]
+        with open(set_file, encoding="utf-8") as f:
+            self.kanji_dict = json.load(f)
 
-    def draw_menu(self):
+        kanjis = list(self.kanji_dict)
+        random.shuffle(kanjis)
+
+        self.questions = []
+        for kanji in kanjis:
+            answers = [kanji]
+            while len(answers) < 4:
+                decoy = random.choice(kanjis)
+                if decoy not in answers:
+                    answers.append(decoy)
+            random.shuffle(answers)
+            correct = answers.index(kanji)
+            self.questions.append((answers, correct))
+
+    def draw(self):
 
         self.screen.fill(BLACK)
 
-        set_name = self.set_names[self.set_index]
-        self.draw_text(self.menu_font, set_name, WHITE, 0.5, 0.5)
+        if self.questions is None:
 
-        pygame.display.flip()
+            set_name = self.set_names[self.set_index]
+            self.draw_text(self.menu_font, set_name, WHITE, 0.5, 0.5)
 
-    def draw_quiz(self):
+        else:
 
-        self.screen.fill(BLACK)
+            answers, correct = self.questions[0]
 
-        correct_kanji = self.options[self.correct]
-        self.draw_text(self.kanji_font, correct_kanji, WHITE, 0.2, 0.25)
+            correct_kanji = answers[correct]
+            self.draw_text(self.kanji_font, correct_kanji, WHITE, 0.2, 0.25)
 
-        _, on, kun = self.kanji_dict[correct_kanji]
-        self.draw_text(self.kana_font, on, WHITE, 0.4, 0.2, "l")
-        self.draw_text(self.kana_font, kun, WHITE, 0.4, 0.3, "l")
+            _, pinyin, on, kun = self.kanji_dict[correct_kanji]
+            self.draw_text(self.pinyin_font, pinyin, WHITE, 0.4, 0.2, "l")
+            self.draw_text(self.kana_font, on, WHITE, 0.4, 0.2, "l")
+            self.draw_text(self.kana_font, kun, WHITE, 0.4, 0.3, "l")
 
-        self.draw_text(self.meaning_font, "+", WHITE, 0.5, 0.68)
+            self.draw_text(self.meaning_font, "+", WHITE, 0.5, 0.7)
 
-        for i, option_kanji in enumerate(self.options):
-            meaning = self.kanji_dict[option_kanji][0].upper()
-            color = WHITE
-            if i == self.selected:
-                if i == self.correct:
-                    color = GREEN
-                else:
-                    color = RED
-            self.draw_text(self.meaning_font, meaning,
-                           color, *ANSWER_COORDS[i])
+            answer_coords = [
+                (0.5, 0.55),
+                (0.43, 0.7, "r"),
+                (0.57, 0.7, "l"),
+                (0.5, 0.85)
+            ]
+
+            for i, option_kanji in enumerate(answers):
+                meaning = self.kanji_dict[option_kanji][0].upper()
+                color = WHITE
+                if i == self.selected:
+                    if i == correct:
+                        color = GREEN
+                    else:
+                        color = RED
+                self.draw_text(self.meaning_font, meaning,
+                               color, *answer_coords[i])
 
         pygame.display.flip()
 

@@ -12,6 +12,7 @@ KANJI_SETS = {
     "GRADE 4": "grade4.json",
     "GRADE 5": "grade5.json",
     "GRADE 6": "grade6.json",
+    "NUMBERS": "numbers.json",
 }
 
 pygame.init()
