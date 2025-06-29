@@ -64,11 +64,11 @@ class Game:
                     else:
 
                         if event.key in {pygame.K_x, pygame.K_UP}:
-                            self.selected = 0
+                            self.selected = 2
                         if event.key in {pygame.K_y, pygame.K_LEFT}:
                             self.selected = 1
                         if event.key in {pygame.K_a, pygame.K_RIGHT}:
-                            self.selected = 2
+                            self.selected = 0
                         if event.key in {pygame.K_b, pygame.K_DOWN}:
                             self.selected = 3
 
@@ -111,6 +111,8 @@ class Game:
                 if decoy not in answers:
                     answers.append(decoy)
             random.shuffle(answers)
+            lengths = {k: len(self.kanji_dict[k]["meaning"]) for k in answers}
+            answers = sorted(answers, key=lengths.__getitem__)
             correct = answers.index(kanji)
             self.questions.append((answers, correct))
 
@@ -142,10 +144,10 @@ class Game:
             self.draw_text(self.meaning_font, "+", WHITE, 0.5, 0.7)
 
             answer_coords = [
-                (0.5, 0.55),
-                (0.43, 0.7, "r"),
                 (0.57, 0.7, "l"),
-                (0.5, 0.85)
+                (0.43, 0.7, "r"),
+                (0.5, 0.55),
+                (0.5, 0.85),
             ]
 
             for i, option_kanji in enumerate(answers):
