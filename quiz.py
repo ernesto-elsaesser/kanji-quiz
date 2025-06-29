@@ -17,7 +17,7 @@ class Game:
 
         self.menu_font = pygame.font.SysFont(font_name, 60)
         self.meaning_font = pygame.font.SysFont(font_name, 35)
-        self.kanji_font = pygame.font.SysFont(font_name_jp, 130)
+        self.kanji_font = pygame.font.SysFont(font_name_jp, 135)
         self.kana_font = pygame.font.SysFont(font_name_jp, 28)
         self.pinyin_font = pygame.font.SysFont(font_name, 28)
 
@@ -57,18 +57,18 @@ class Game:
                         elif event.key == pygame.K_RIGHT:
                             if self.set_index < len(self.set_names) - 1:
                                 self.set_index += 1
-                        elif event.key == pygame.K_a:
+                        elif event.key in {pygame.K_a, pygame.K_RETURN}:
                             self.load_set()
 
                     else:
 
-                        if event.key == pygame.K_x:
+                        if event.key in {pygame.K_x, pygame.K_UP}:
                             self.selected = 0
-                        if event.key == pygame.K_y:
+                        if event.key in {pygame.K_y, pygame.K_LEFT}:
                             self.selected = 1
-                        if event.key == pygame.K_a:
+                        if event.key in {pygame.K_a, pygame.K_RIGHT}:
                             self.selected = 2
-                        if event.key == pygame.K_b:
+                        if event.key in {pygame.K_b, pygame.K_DOWN}:
                             self.selected = 3
 
                         if self.selected == self.questions[0][1]:
@@ -130,9 +130,9 @@ class Game:
             self.draw_text(self.kanji_font, correct_kanji, WHITE, 0.2, 0.25)
 
             _, pinyin, on, kun = self.kanji_dict[correct_kanji]
-            self.draw_text(self.pinyin_font, pinyin, WHITE, 0.4, 0.2, "l")
-            self.draw_text(self.kana_font, on, WHITE, 0.4, 0.2, "l")
-            self.draw_text(self.kana_font, kun, WHITE, 0.4, 0.3, "l")
+            self.draw_text(self.pinyin_font, pinyin, WHITE, 0.4, 0.15, "l")
+            self.draw_text(self.kana_font, on, WHITE, 0.4, 0.25, "l")
+            self.draw_text(self.kana_font, kun, WHITE, 0.4, 0.35, "l")
 
             self.draw_text(self.meaning_font, "+", WHITE, 0.5, 0.7)
 
