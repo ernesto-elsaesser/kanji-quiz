@@ -16,8 +16,8 @@ class Game:
 
         self.screen = pygame.display.set_mode((width, height))
 
-        self.msg_font = pygame.font.SysFont(None, 50)
-        self.message("LOADING")
+        self.msg_font = pygame.font.SysFont(None, 65)
+        self.message("HI")
 
         font_names = pygame.font.get_fonts()
         font_name = [n for n in latin_fonts if n in font_names][0]
