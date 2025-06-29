@@ -1,5 +1,5 @@
-PYGAME_DIR="/Volumes/SHARE/roms/pygame/quiz"
-IMAGE_DIR="/Volumes/SHARE/roms/pygame/images"
+PYGAME_DIR="/Volumes/SHARE/roms/pygame"
+IMAGE_DIR="$PYGAME_DIR/images"
 GAME_DIR="$PYGAME_DIR/quiz"
 mkdir -p "$GAME_DIR"
 cp -r sets "$GAME_DIR"
