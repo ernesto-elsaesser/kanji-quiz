@@ -52,14 +52,13 @@ class Game:
                     if self.questions is None:
 
                         if event.key == pygame.K_LEFT:
-                            if self.set_index > 0:
-                                self.set_index -= 1
+                            self.set_index -= 1
                         elif event.key == pygame.K_RIGHT:
-                            if self.set_index < len(self.set_names) - 1:
-                                self.set_index += 1
+                            self.set_index += 1
                         elif event.key == pygame.K_RETURN:
                             self.load_set()
 
+                        self.set_index %= len(self.set_names)
                     else:
 
                         correct = self.questions[0][1]
