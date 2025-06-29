@@ -1,5 +1,7 @@
-# kanji-quiz
+# Kanji Quiz
 
-Super simple Kanji quiz built with pygame
+Super simple Kanji quiz built with pygame.
 
-Jouyou Kanji list from https://github.com/NHV33/joyo-kanji-compilation/tree/master
+Jouyou Kanji list from https://github.com/NHV33/joyo-kanji-compilation/tree/master (some meanings shortened)
+
+Hanzi list from https://github.com/yannickmahe/HanziList/blob/master/hanzi.csv

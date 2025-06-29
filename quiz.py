@@ -119,7 +119,7 @@ class Game:
 
         if self.questions is None:
 
-            set_name = self.set_names[self.set_index]
+            set_name = "< " + self.set_names[self.set_index] + " >"
             self.draw_text(self.menu_font, set_name, WHITE, 0.5, 0.5)
 
         else:
@@ -129,7 +129,11 @@ class Game:
             correct_kanji = answers[correct]
             self.draw_text(self.kanji_font, correct_kanji, WHITE, 0.2, 0.25)
 
-            _, pinyin, on, kun = self.kanji_dict[correct_kanji]
+            info = self.kanji_dict[correct_kanji]
+            on = "、".join(info["ons"][:3])
+            kun = "、".join(info["kuns"][:3])
+            pinyin = info["pinyin"]
+
             self.draw_text(self.pinyin_font, pinyin, WHITE, 0.4, 0.15, "l")
             self.draw_text(self.kana_font, on, WHITE, 0.4, 0.25, "l")
             self.draw_text(self.kana_font, kun, WHITE, 0.4, 0.35, "l")
@@ -144,7 +148,8 @@ class Game:
             ]
 
             for i, option_kanji in enumerate(answers):
-                meaning = self.kanji_dict[option_kanji][0].upper()
+                info = self.kanji_dict[option_kanji]
+                meaning = info["meaning"].upper()
                 color = WHITE
                 if i == self.selected:
                     if i == correct:
