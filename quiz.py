@@ -40,6 +40,15 @@ class Game:
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
 
+                    if event.key == pygame.K_h:
+                        self.function_pressed = False
+                    elif event.key == pygame.K_RETURN:
+                        if self.function_pressed:
+                            self.draw_end()
+                            return
+                    elif event.key == pygame.K_ESCAPE:
+                        return
+
                     if self.questions is None:
 
                         if event.key == pygame.K_LEFT:
@@ -66,6 +75,9 @@ class Game:
                             self.frames_to_next = 4
 
                     self.draw()
+
+                elif event.type == pygame.KEYUP:
+                    self.function_pressed = False
 
             if self.frames_to_next is not None:
                 if self.frames_to_next == 0:
@@ -142,6 +154,12 @@ class Game:
                 self.draw_text(self.meaning_font, meaning,
                                color, *answer_coords[i])
 
+        pygame.display.flip()
+
+    def draw_end(self):
+
+        self.screen.fill(BLACK)
+        self.draw_text(self.menu_font, "BYE", WHITE, 0.5, 0.5)
         pygame.display.flip()
 
     def draw_text(self, font, text, color, wp, hp, anchor=None):
