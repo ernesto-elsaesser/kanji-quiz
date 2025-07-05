@@ -19,7 +19,7 @@ SCANCODE_MAP = {
 }
 
 
-SDL_Init(SDL_INIT_VIDEO)
+SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS)
 
 window = SDL_CreateWindow(b"Kanji Quiz", 0, 0, 640, 480, SDL_WINDOW_SHOWN)
 wsurf = SDL_GetWindowSurface(window)
@@ -64,7 +64,7 @@ while running:
             print("KEYDOWN EVENT")
             code = event.key.keysym.scancode
             key = SCANCODE_MAP.get(code)
-            print("- KEY", code, map)
+            print("- KEY", code, key)
             if key is None:
                 running = False
                 break
