@@ -14,5 +14,7 @@ GAME_DIR="$APPS_DIR/quiz"
     echo "main.py $?"
     cp -r "$SOURCE_DIR/sets" "$GAME_DIR/"
     echo "sets $?"
+    cp -r "$SOURCE_DIR/pysdl" "$GAME_DIR/"
+    echo "pysdl $?"
 
 } 2>&1 | tee -a install.log
