@@ -6,19 +6,17 @@ import quiz
 
 FONT_PATH = b"DejaVuSansMono.ttf"
 
-KEY_CODES = {
-    SDLK_LEFT: "LEFT",
-    SDLK_RIGHT: "RIGHT",
-    SDLK_UP: "UP",
-    SDLK_DOWN: "DOWN",
-    SDLK_a: "A",
-    SDLK_b: "B",
-    SDLK_x: "X",
-    SDLK_y: "Y",
-    SDLK_RETURN: "START",
+SCANCODE_MAP = {
+    SDL_SCANCODE_LEFT: "LEFT",
+    SDL_SCANCODE_RIGHT: "RIGHT",
+    SDL_SCANCODE_UP: "UP",
+    SDL_SCANCODE_DOWN: "DOWN",
+    SDL_SCANCODE_A: "A",
+    SDL_SCANCODE_B: "B",
+    SDL_SCANCODE_X: "X",
+    SDL_SCANCODE_Y: "Y",
+    SDL_SCANCODE_RETURN: "START",
 }
-
-FONT_CACHE = {}
 
 
 SDL_Init(SDL_INIT_VIDEO)
@@ -54,12 +52,7 @@ def show_text(texts):
     SDL_UpdateWindowSurface(window)
 
 
-print("INIT")
-
 game = quiz.Game(show_text)
-
-
-print("START")
 
 running = True
 event = SDL_Event()
@@ -69,16 +62,16 @@ while running:
 
         if event.type == SDL_KEYDOWN:
             print("KEYDOWN EVENT")
-            print("- SCAN/SYM", event.key.keysym.scancode, event.key.keysym.sym)
-            code = event.key.keysym.sym
-            if code in (SDLK_h, SDLK_ESCAPE):
+            code = event.key.keysym.scancode
+            key = SCANCODE_MAP.get(code)
+            print("- KEY", code, map)
+            if key is None:
                 running = False
                 break
             else:
-                key = KEY_CODES.get(code)
-                print("PRESS", key)
-                if key is not None:
-                    game.press(key)
+                game.press(key)
+        elif event.type == SDL_KEYUP:
+            print("KEYUP EVENT")
         elif event.type == SDL_QUIT:
             print("QUIT EVENT")
             running = False
