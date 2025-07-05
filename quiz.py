@@ -1,6 +1,7 @@
 import os
 import json
 import random
+import sets
 
 
 WHITE = (200, 200, 200)
@@ -14,12 +15,7 @@ class Game:
     def __init__(self, show_text):
 
         self.show_text = show_text
-
-        self.set_files = {n[:-5]: "sets/" + n for n
-                          in sorted(os.listdir("sets"))}
-
-        self.set_names = list(self.set_files)
-
+        self.set_names = list(sets.SETS)
         self.set_index = 0
         self.kanji_dict = {}
         self.questions = None
@@ -82,9 +78,7 @@ class Game:
 
     def load_set(self):
 
-        set_file = self.set_files[self.set_names[self.set_index]]
-        with open(set_file, encoding="utf-8") as f:
-            self.kanji_dict = json.load(f)
+        self.kanji_dict = sets.SETS[self.set_names[self.set_index]]
 
         kanjis = list(self.kanji_dict)
         random.shuffle(kanjis)

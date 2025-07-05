@@ -43,9 +43,6 @@ def show_text(texts):
         fg = SDL_Color(*color)
         utf8_bytes = text.encode('utf-8')
         tsurf = TTF_RenderUTF8_Blended(font, utf8_bytes, fg)
-        if not tsurf:
-            print("ERROR:", text)
-            continue
         tw = tsurf.contents.w
         th = tsurf.contents.h
         rx = (ww * wp) - (tw * align)
@@ -76,7 +73,6 @@ while running:
             else:
                 key = KEY_CODES.get(code)
                 if key is not None:
-                    print(key)
                     game.press(key)
 
         elif event.type == SDL_KEYUP:

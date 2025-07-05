@@ -6,7 +6,7 @@ import json
 EXCLUDE = "兄弟姉妹"
 NUMBERS = "一二三四五六七八九十百千万"
 
-kanjis = {}
+kanjis: dict[str, dict] = {}
 
 with open("kanji.csv", encoding='utf-8') as f:
     reader = csv.reader(f)
@@ -35,20 +35,25 @@ with open("hanzi.csv", encoding='utf-8') as f:
                 info["pinyins"].append(pinyin)
 
 
-os.makedirs("sets", exist_ok=True)
+sets_py = open("sets.py", "w")
+
+sets_py.write("SETS = {\n")
 
 
-def build_set(name, include):
+def add_set(name: str, include):
 
     kanji_dict = {k: i for k, i in kanjis.items() if include(k, i)}
-    with open(f"sets/{name}.json", "w", encoding="utf-8") as f:
-        json.dump(kanji_dict, f, indent=4, ensure_ascii=False)
+    sets_py.write(f"  '{name}': {kanji_dict},\n")
 
 
 for grade_num in range(1, 7):
-    build_set(f"GRADE {grade_num}", lambda k, i: i["grade"] == str(grade_num))
+    add_set(f"GRADE {grade_num}", lambda k, i: i["grade"] == str(grade_num))
 
 for jlpt_level in range(6):
-    build_set(f"JLPT N{jlpt_level}", lambda k, i: i["jlpt"] == jlpt_level)
+    add_set(f"JLPT N{jlpt_level}", lambda k, i: i["jlpt"] == jlpt_level)
 
-build_set("NUMBERS", lambda k, _: k in NUMBERS)
+add_set("NUMBERS", lambda k, _: k in NUMBERS)
+
+sets_py.write("}\n")
+
+sets_py.close()
