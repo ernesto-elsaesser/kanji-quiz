@@ -1,89 +1,84 @@
-import sdl2
-import sdl2.ext
+import ctypes
+from sdl2 import *
+import sdl2.sdlttf
 import quiz
 
 
-FONT_NAME = "DejaVuSansMono.ttf"
+FONT_PATH = b"DejaVuSansMono.ttf"
 
 KEY_CODES = {
-    sdl2.SDLK_LEFT: "LEFT",
-    sdl2.SDLK_RIGHT: "RIGHT",
-    sdl2.SDLK_UP: "UP",
-    sdl2.SDLK_DOWN: "DOWN",
-    sdl2.SDLK_a: "A",
-    sdl2.SDLK_b: "B",
-    sdl2.SDLK_x: "X",
-    sdl2.SDLK_y: "Y",
-    sdl2.SDLK_RETURN: "START",
+    SDLK_LEFT: "LEFT",
+    SDLK_RIGHT: "RIGHT",
+    SDLK_UP: "UP",
+    SDLK_DOWN: "DOWN",
+    SDLK_a: "A",
+    SDLK_b: "B",
+    SDLK_x: "X",
+    SDLK_y: "Y",
+    SDLK_RETURN: "START",
 }
 
-
-class Screen(quiz.Screen):
-
-    def __init__(self, width, height):
-
-        super().__init__(width, height)
-
-        self.window = sdl2.ext.Window("Kanji Quiz", size=(width, height))
-        self.window.show()
-        self.surface = self.window.get_surface()
-        self.font_cache = {}
-
-    def clear(self):
-
-        sdl2.ext.fill(self.surface, sdl2.ext.Color(0, 0, 0))
-
-    def text(self, font_size, text, color, wp, hp, align):
-
-        font = self.font_cache.get(font_size)
-        if font is None:
-            font = sdl2.ext.ttf.FontTTF(FONT_NAME, font_size, color)
-            self.font_cache[font_size] = font
-
-        text_surface = font.render_text(text)
-        tw = text_surface.w
-        th = text_surface.h
-        ry = (self.height * hp) - (th * 0.5)
-        rx = (self.width * wp) - (tw * align)
-        rect = sdl2.rect.SDL_Rect(rx, ry, tw, th)
-        sdl2.SDL_BlitSurface(text_surface, rect, self.surface, None)
-
-    def show(self):
-
-        self.window.refresh()
-
-    def delay(self):
-
-        sdl2.SDL_Delay(100)
+FONT_CACHE = {}
 
 
-sdl2.ext.init()
+SDL_Init(SDL_INIT_VIDEO)
 
-screen = Screen(640, 480)
-game = quiz.Game(screen)
+window = SDL_CreateWindow(b"Kanji Quiz", 0, 0, 640, 480, SDL_WINDOW_SHOWN)
+wsurf = SDL_GetWindowSurface(window)
+wrect = SDL_Rect(0, 0, wsurf.w, wsurf.h)
+
+sdl2.sdlttf.TTF_Init()
+
+font = sdl2.sdlttf.TTF_OpenFont(FONT_PATH, 16)
+
+
+def show_text(texts):
+
+    SDL_FillRect(wsurf, wrect, 0)
+
+    for font_size, text, color, wp, hp, align in texts:
+
+        sdl2.sdlttf.TTF_SetFontSize(font, font_size)
+        fg = SDL_MapRGB(color)
+        tsurf = sdl2.sdlttf.TTF_RenderUTF8_Blended(font, text, fg)
+
+        tw = tsurf.w
+        th = tsurf.h
+        ry = (wsurf.h * hp) - (th * 0.5)
+        rx = (wsurf.w * wp) - (tw * align)
+        rect = SDL_Rect(rx, ry, tw, th)
+        SDL_BlitSurface(tsurf, rect, wsurf, None)
+
+    SDL_UpdateWindowSurface(window)
+
+
+game = quiz.Game(show_text)
 
 running = True
 function_pressed = False
+event = SDL_Event()
 
 while running:
-    for event in sdl2.ext.get_events():
-        if event.type == sdl2.SDL_KEYDOWN:
+    while SDL_PollEvent(ctypes.byref(event)) != 0:
+        if event.type == SDL_KEYDOWN:
 
-            if event.key == sdl2.SDLK_h:
+            if event.key == SDLK_h:
                 function_pressed = True
-            elif function_pressed and event.key == sdl2.SDLK_RETURN:
+            elif function_pressed and event.key == SDLK_RETURN:
                 running = False
-            elif event.key == sdl2.SDLK_ESCAPE:
+            elif event.key == SDLK_ESCAPE:
                 running = False
             else:
                 key = KEY_CODES.get(event.key)
                 if key is not None:
                     game.press(key)
 
-        elif event.type == sdl2.SDL_KEYUP:
-            if event.key == sdl2.SDLK_h:
+        elif event.type == SDL_KEYUP:
+            if event.key == SDLK_h:
                 function_pressed = False
 
+    SDL_Delay(100)
     game.tick()
 
-sdl2.ext.quit()
+SDL_DestroyWindow(window)
+SDL_Quit()

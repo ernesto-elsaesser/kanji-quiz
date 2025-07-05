@@ -5,8 +5,6 @@ PYGAME_DIR="/userdata/roms/pygame"
 IMAGE_DIR="$PYGAME_DIR/images"
 GAME_DIR="$PYGAME_DIR/quiz"
 
-echo "$(date) START" >> "install.log"
-
 {
     echo "$(date)"
     mkdir -p "$GAME_DIR"
@@ -20,6 +18,4 @@ echo "$(date) START" >> "install.log"
     cp -r "$SOURCE_DIR/sets" "$GAME_DIR/"
     echo "sets $?"
 
-} 2>&1 | tee -a output.txt
-
-echo "$(date) END" >> "install.log"
+} 2>&1 | tee -a install.log

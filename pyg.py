@@ -16,48 +16,37 @@ KEY_CODES = {
     pygame.K_RETURN: "START",
 }
 
-
-class Screen(quiz.Screen):
-
-    def __init__(self, width, height):
-
-        super().__init__(width, height)
-
-        self.display = pygame.display.set_mode((width, height))
-        self.font_cache = {}
-
-    def clear(self):
-
-        self.display.fill((0, 0, 0))
-
-    def text(self, font_size, text, color, wp, hp, align):
-
-        font = self.font_cache.get(font_size)
-        if font is None:
-            font = pygame.font.Font(FONT_NAME, font_size)
-            self.font_cache[font_size] = font
-
-        text_surface = font.render(text, True, color)
-        tw = text_surface.get_width()
-        th = text_surface.get_height()
-        ry = (self.height * hp) - (th * 0.5)
-        rx = (self.width * wp) - (tw * align)
-        rect = pygame.Rect(rx, ry, tw, th)
-        self.display.blit(text_surface, rect)
-
-    def show(self):
-
-        pygame.display.flip()
-
-    def delay(self):
-
-        pygame.time.Clock().tick(10)
+FONT_CACHE = {}
 
 
 pygame.init()
 
-screen = Screen(640, 480)
-game = quiz.Game(screen)
+display = pygame.display.set_mode((640, 480))
+w, h = display.get_size()
+
+
+def show_text(texts):
+
+    display.fill((0, 0, 0))
+
+    for font_size, text, color, wp, hp, align in texts:
+
+        font = FONT_CACHE.get(font_size)
+        if font is None:
+            font = pygame.font.Font(FONT_NAME, font_size)
+            FONT_CACHE[font_size] = font
+
+        text_surface = font.render(text, True, color)
+        tw, th = text_surface.get_size()
+        ry = (h * hp) - (th * 0.5)
+        rx = (w * wp) - (tw * align)
+        rect = pygame.Rect(rx, ry, tw, th)
+        display.blit(text_surface, rect)
+
+    pygame.display.flip()
+
+
+game = quiz.Game(show_text)
 
 running = True
 function_pressed = False
@@ -81,6 +70,7 @@ while running:
             if event.key == pygame.K_h:
                 function_pressed = False
 
+    pygame.time.Clock().tick(10)
     game.tick()
 
 pygame.quit()
