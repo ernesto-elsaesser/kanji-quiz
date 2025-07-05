@@ -28,7 +28,7 @@ class Screen:
 
         raise NotImplementedError
 
-    def defer(self, callback, frames):
+    def delay(self):
 
         raise NotImplementedError
 
@@ -49,7 +49,6 @@ class Game:
         self.questions = None
         self.selected = None
         self.frames_to_next = None
-        self.function_pressed = False
 
         self.draw()
 
@@ -81,9 +80,20 @@ class Game:
                 self.questions = None
 
             if self.selected == correct:
-                self.screen.defer(self.next_question, 4)
+                self.frames_to_next = 4
 
         self.draw()
+
+    def tick(self):
+
+        self.screen.delay()
+
+        if self.frames_to_next is None:
+            if self.frames_to_next == 0:
+                self.frames_to_next = None
+                self.next_question()
+            else:
+                self.frames_to_callback -= 1
 
     def next_question(self):
 

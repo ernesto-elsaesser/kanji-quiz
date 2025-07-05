@@ -8,7 +8,7 @@ KEY_CODES = {
     pygame.K_LEFT: "LEFT",
     pygame.K_RIGHT: "RIGHT",
     pygame.K_UP: "UP",
-    pygame.K_DOWN: "K_DOWN",
+    pygame.K_DOWN: "DOWN",
     pygame.K_a: "A",
     pygame.K_b: "B",
     pygame.K_x: "X",
@@ -24,15 +24,7 @@ class Screen(quiz.Screen):
         super().__init__(width, height)
 
         self.display = pygame.display.set_mode((width, height))
-
         self.font_cache = {}
-
-        self.clear()
-        self.text(65, "HI", (255, 255, 255), 0.5, 0.5)
-        self.show()
-
-        self.frames_to_callback = None
-        self.callback = None
 
     def clear(self):
 
@@ -60,25 +52,9 @@ class Screen(quiz.Screen):
 
         pygame.display.flip()
 
-    def defer(self, callback, frames):
-
-        self.frames_to_callback = frames
-        self.callback = callback
-
-    def tick(self):
+    def delay(self):
 
         pygame.time.Clock().tick(10)
-
-        if self.frames_to_callback is None:
-            return
-
-        if self.frames_to_callback == 0:
-            screen.frames_to_callback = None
-            if self.callback is not None:
-                self.callback()
-                self.callback = None
-        else:
-            self.frames_to_callback -= 1
 
 
 pygame.init()
@@ -108,6 +84,6 @@ while running:
             if event.key == pygame.K_h:
                 function_pressed = False
 
-    screen.tick()
+    game.tick()
 
 pygame.quit()

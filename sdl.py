@@ -1,18 +1,15 @@
 import sdl2
 import sdl2.ext
-import sdl2.sdlttf
 import quiz
 
 
-# TODO
-FONT_FILE_LATIN = "dejavusansmono"
-FONT_FILE_JAPANESE = "notosansjp"
+FONT_NAME = "DejaVuSansMono.ttf"
 
 KEY_CODES = {
     sdl2.SDLK_LEFT: "LEFT",
     sdl2.SDLK_RIGHT: "RIGHT",
     sdl2.SDLK_UP: "UP",
-    sdl2.SDLK_DOWN: "K_DOWN",
+    sdl2.SDLK_DOWN: "DOWN",
     sdl2.SDLK_a: "A",
     sdl2.SDLK_b: "B",
     sdl2.SDLK_x: "X",
@@ -29,76 +26,44 @@ class Screen(quiz.Screen):
 
         self.window = sdl2.ext.Window("Kanji Quiz", size=(width, height))
         self.window.show()
-
         self.surface = self.window.get_surface()
-
-        default_font = sdl2.sdlttf.TTF_OpenFont(FONT_FILE_LATIN, 65)
-
-        self.clear()
-        self.text(default_font, "HI", (255, 255, 255), 0.5, 0.5)
-        self.show()
-
-        font_names = pygame.font.get_fonts()
-        self.font_name = [n for n in LATIN_FONTS if n in font_names][0]
-        self.font_name_jp = [n for n in JAPANESE_FONTS if n in font_names][0]
         self.font_cache = {}
-
-        self.frames_to_callback = None
-        self.callback = None
 
     def clear(self):
 
         sdl2.ext.fill(self.surface, sdl2.ext.Color(0, 0, 0))
 
-    def text(self, font_name, font_size, text, color, wp, hp, anchor=None):
+    def text(self, font_size, text, color, wp, hp, anchor=None):
 
-        font_args = font_name, font_size
-        font = self.font_cache.get(font_args)
+        font = self.font_cache.get(font_size)
         if font is None:
-            pt_size = sdl2.sdlttf.TTF_GlyphMetrics(
-                font, ch, minx, maxx, miny, maxy, advance)
-            font = sdl2.sdlttf.TTF_OpenFont(FONT_FILE_LATIN, pt_size)
-            self.font_cache[font_args] = font
+            font = sdl2.ext.ttf.FontTTF(FONT_NAME, font_size, color)
+            self.font_cache[font_size] = font
 
-        sdl_color = sdl2.ext.Color(*color)
-        x = self.width * wp
-        y = self.height * hp
-        text_surface = font.render(text, True, color)
+        text_surface = font.render_text(text)
+
         if anchor == "l":
-            rect = text_surface.get_rect(midleft=(x, y))
+            hf = 0.0
         elif anchor == "r":
-            rect = text_surface.get_rect(midright=(x, y))
+            hf = 1.0
         else:
-            rect = text_surface.get_rect(center=(x, y))
-        self.display.blit(text_surface, rect)
+            hf = 0.5
+
+        ry = (self.height * hp) - (text_surface.h * hf)
+        rx = (self.width * wp) - (text_surface.w * 0.5)
+        rect = sdl2.rect.SDL_Rect(rx, ry, text_surface.w, text_surface.h)
+        sdl2.SDL_BlitSurface(text_surface, rect, self.surface, None)
 
     def show(self):
 
         self.window.refresh()
 
-    def defer(self, callback, frames):
+    def delay(self):
 
-        self.frames_to_callback = frames
-        self.callback = callback
-
-    def tick(self):
-
-        pygame.time.Clock().tick(10)
-
-        if self.frames_to_callback is None:
-            return
-
-        if self.frames_to_callback == 0:
-            screen.frames_to_callback = None
-            if self.callback is not None:
-                self.callback()
-                self.callback = None
-        else:
-            self.frames_to_callback -= 1
+        sdl2.SDL_Delay(100)
 
 
 sdl2.ext.init()
-sdl2.sdlttf.TTF_Init()
 
 screen = Screen(640, 480)
 game = quiz.Game(screen)
@@ -125,7 +90,6 @@ while running:
             if event.key == sdl2.SDLK_h:
                 function_pressed = False
 
-    screen.tick()
+    game.tick()
 
 sdl2.ext.quit()
-sdl2.sdlttf.TTF_Quit()
