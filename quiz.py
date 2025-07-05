@@ -88,12 +88,12 @@ class Game:
 
         self.screen.delay()
 
-        if self.frames_to_next is None:
+        if self.frames_to_next is not None:
             if self.frames_to_next == 0:
                 self.frames_to_next = None
                 self.next_question()
             else:
-                self.frames_to_callback -= 1
+                self.frames_to_next -= 1
 
     def next_question(self):
 
