@@ -2,8 +2,7 @@ import pygame
 import quiz
 
 
-LATIN_FONTS = ["dejavusansmono", "consolas", "sfnsmono", "dejavusans"]
-JAPANESE_FONTS = ["notosansjp", "hiraginosansgb"]
+FONT_NAME = "DejaVuSansMono.ttf"
 
 KEY_CODES = {
     pygame.K_LEFT: "LEFT",
@@ -26,16 +25,11 @@ class Screen(quiz.Screen):
 
         self.display = pygame.display.set_mode((width, height))
 
-        default_font = pygame.font.SysFont(None, 65)
+        self.font_cache = {}
 
         self.clear()
-        self.text(default_font, "HI", (255, 255, 255), 0.5, 0.5)
+        self.text(65, "HI", (255, 255, 255), 0.5, 0.5)
         self.show()
-
-        font_names = pygame.font.get_fonts()
-        self.font_name = [n for n in LATIN_FONTS if n in font_names][0]
-        self.font_name_jp = [n for n in JAPANESE_FONTS if n in font_names][0]
-        self.font_cache = {}
 
         self.frames_to_callback = None
         self.callback = None
@@ -44,13 +38,12 @@ class Screen(quiz.Screen):
 
         self.display.fill((0, 0, 0))
 
-    def text(self, font_name, font_size, text, color, wp, hp, anchor=None):
+    def text(self, font_size, text, color, wp, hp, anchor=None):
 
-        font_args = font_name, font_size
-        font = self.font_cache.get(font_args)
+        font = self.font_cache.get(font_size)
         if font is None:
-            font = pygame.font.SysFont(*font_args)
-            self.font_cache[font_args] = font
+            font = pygame.font.Font(FONT_NAME, font_size)
+            self.font_cache[font_size] = font
 
         x = self.width * wp
         y = self.height * hp
