@@ -1,9 +1,25 @@
-SOURCE_DIR="media/SHUTTLE/kanji-quiz"
+#!/bin/bash
+
+SOURCE_DIR="/media/SHUTTLE/kanji-quiz"
 PYGAME_DIR="/userdata/roms/pygame"
 IMAGE_DIR="$PYGAME_DIR/images"
 GAME_DIR="$PYGAME_DIR/quiz"
-mkdir -p "$GAME_DIR"
-cp -r "$SOURCE_DIR/sets" "$GAME_DIR"
-cp "$SOURCE_DIR/quiz.py" "$GAME_DIR/quiz.py"
-cp "$SOURCE_DIR/main.py" "$GAME_DIR/kanji-quiz.pygame"
-cp "$SOURCE_DIR/kanji.png" "$IMAGE_DIR/kanji-quiz.png"
+
+echo "$(date) START" >> "install.log"
+
+{
+    echo "$(date)"
+    mkdir -p "$GAME_DIR"
+    echo "mkdir $?"
+    cp "$SOURCE_DIR/quiz.py" "$GAME_DIR/"
+    echo "quiz.py $?"
+    cp "$SOURCE_DIR/game.py" "$GAME_DIR/kanji-quiz.pygame"
+    echo "kanji-quiz.pygame $?"
+    cp "$SOURCE_DIR/kanji.png" "$IMAGE_DIR/kanji-quiz.png"
+    echo "kanji-quiz.png $?"
+    cp -r "$SOURCE_DIR/sets" "$GAME_DIR/"
+    echo "sets $?"
+
+} 2>&1 | tee -a output.txt
+
+echo "$(date) END" >> "install.log"
