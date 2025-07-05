@@ -1,3 +1,4 @@
+import time
 import ctypes
 from pysdl import *
 import quiz
@@ -53,34 +54,41 @@ def show_text(texts):
     SDL_UpdateWindowSurface(window)
 
 
+print("INIT")
+
 game = quiz.Game(show_text)
 
+
+print("START")
+
 running = True
-function_pressed = False
 event = SDL_Event()
 
 while running:
     while SDL_PollEvent(ctypes.byref(event)) != 0:
 
         if event.type == SDL_KEYDOWN:
+            print("KEYDOWN EVENT")
+            print("- SCAN/SYM", event.key.keysym.scancode, event.key.keysym.sym)
             code = event.key.keysym.sym
-            if code == SDLK_h:
-                function_pressed = True
-            elif function_pressed and code == SDLK_RETURN:
+            if code in (SDLK_h, SDLK_ESCAPE):
                 running = False
-            elif code == SDLK_ESCAPE:
-                running = False
+                break
             else:
                 key = KEY_CODES.get(code)
+                print("PRESS", key)
                 if key is not None:
                     game.press(key)
+        elif event.type == SDL_QUIT:
+            print("QUIT EVENT")
+            running = False
+            break
+        else:
+            print("OTHER EVENT", event.type)
 
-        elif event.type == SDL_KEYUP:
-            if event.key.keysym.sym == SDLK_h:
-                function_pressed = False
-
-    SDL_Delay(100)
+    time.sleep(0.1)
     game.tick()
 
+print("EXIT")
 SDL_DestroyWindow(window)
 SDL_Quit()
