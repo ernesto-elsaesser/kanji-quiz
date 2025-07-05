@@ -20,11 +20,7 @@ class Screen:
 
         raise NotImplementedError
 
-    def latin(self, font_size, text, color, wp, hp, anchor=None):
-
-        raise NotImplementedError
-
-    def japanese(self, font_size, text, color, wp, hp, anchor=None):
+    def text(self, font_name, font_size, text, color, wp, hp, anchor=None):
 
         raise NotImplementedError
 
@@ -39,9 +35,12 @@ class Screen:
 
 class Game:
 
-    def __init__(self, screen):
+    def __init__(self, screen, font_name, font_name_jp):
 
         self.screen = screen
+
+        self.font_name = font_name
+        self.font_name_jp = font_name_jp
 
         self.set_files = {n[:-5]: "sets/" + n for n
                           in sorted(os.listdir("sets"))}
@@ -129,25 +128,27 @@ class Game:
         if self.questions is None:
 
             set_name = "< " + self.set_names[self.set_index] + " >"
-            self.screen.latin(60, set_name, WHITE, 0.5, 0.5)
+            self.screen.text(self.font_name, 60, set_name, WHITE, 0.5, 0.5)
 
         else:
 
             answers, correct = self.questions[0]
 
             correct_kanji = answers[correct]
-            self.screen.japanese(135, correct_kanji, WHITE, 0.2, 0.25)
+            self.screen.text(self.font_name_jp, 135,
+                             correct_kanji, WHITE, 0.2, 0.25)
 
             info = self.kanji_dict[correct_kanji]
             on = "、".join(info["ons"][:3])
             kun = "、".join(info["kuns"][:3])
             pinyin = ", ".join(info["pinyins"][:3])
 
-            self.screen.latin(28, pinyin, DIM_WHITE, 0.4, 0.15, "l")
-            self.screen.japanese(28, on, WHITE, 0.4, 0.25, "l")
-            self.screen.japanese(28, kun, WHITE, 0.4, 0.35, "l")
+            self.screen.text(self.font_name, 28, pinyin,
+                             DIM_WHITE, 0.4, 0.15, "l")
+            self.screen.text(self.font_name_jp, 28, on, WHITE, 0.4, 0.25, "l")
+            self.screen.text(self.font_name_jp, 28, kun, WHITE, 0.4, 0.35, "l")
 
-            self.screen.latin(35, "+", WHITE, 0.5, 0.7)
+            self.screen.text(self.font_name, 35, "+", WHITE, 0.5, 0.7)
 
             answer_coords = [
                 (0.57, 0.7, "l"),
@@ -165,6 +166,7 @@ class Game:
                         color = GREEN
                     else:
                         color = RED
-                self.screen.latin(35, meaning, color, *answer_coords[i])
+                self.screen.text(self.font_name, 35, meaning,
+                                 color, *answer_coords[i])
 
         self.screen.show()
