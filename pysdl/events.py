@@ -6,26 +6,16 @@ from .dll import version as sdl_version
 from .dll import _bind, SDLFunc, AttributeDict
 from .stdinc import Sint16, Sint32, Uint8, Uint16, Uint32, Uint64, SDL_bool
 from .keyboard import SDL_Keysym
-from .joystick import SDL_JoystickID, SDL_JoystickPowerLevel
-from .touch import SDL_FingerID, SDL_TouchID
-from .gesture import SDL_GestureID
-from .syswm import SDL_SysWMmsg
 
 __all__ = [
     # Structs, Unions, & Opaque Types
-    "SDL_CommonEvent", "SDL_DisplayEvent", "SDL_WindowEvent", 
+    "SDL_CommonEvent", "SDL_DisplayEvent", "SDL_WindowEvent",
     "SDL_KeyboardEvent", "SDL_TextEditingEvent",
     "SDL_TextEditingExtEvent", "SDL_TextInputEvent",
     "SDL_MouseMotionEvent", "SDL_MouseButtonEvent", "SDL_MouseWheelEvent",
-    "SDL_JoyAxisEvent", "SDL_JoyBallEvent", "SDL_JoyHatEvent",
-    "SDL_JoyButtonEvent", "SDL_JoyDeviceEvent", "SDL_JoyBatteryEvent",
-    "SDL_ControllerAxisEvent", "SDL_ControllerButtonEvent",
-    "SDL_ControllerDeviceEvent", "SDL_ControllerTouchpadEvent",
-    "SDL_ControllerSensorEvent",
     "SDL_AudioDeviceEvent",
-    "SDL_TouchFingerEvent", "SDL_MultiGestureEvent", "SDL_DollarGestureEvent",
-    "SDL_DropEvent", "SDL_QuitEvent", "SDL_OSEvent", "SDL_UserEvent", 
-    "SDL_SysWMmsg", "SDL_SysWMEvent", "SDL_SensorEvent", "SDL_Event",
+    "SDL_DropEvent", "SDL_QuitEvent", "SDL_OSEvent", "SDL_UserEvent",
+    "SDL_SensorEvent", "SDL_Event",
 
     # Defines
     "SDL_RELEASED", "SDL_PRESSED",
@@ -62,8 +52,8 @@ __all__ = [
     "SDL_USEREVENT", "SDL_LASTEVENT",
 
     "SDL_eventaction",
-    "SDL_ADDEVENT", "SDL_PEEKEVENT", "SDL_GETEVENT", 
-    
+    "SDL_ADDEVENT", "SDL_PEEKEVENT", "SDL_GETEVENT",
+
     # Macro Functions
     "SDL_GetEventState", "SDL_QuitRequested",
 
@@ -162,6 +152,7 @@ class SDL_CommonEvent(Structure):
         ("timestamp", Uint32),
     ]
 
+
 class SDL_DisplayEvent(Structure):
     _fields_ = [
         ("type", Uint32),
@@ -173,6 +164,7 @@ class SDL_DisplayEvent(Structure):
         ("padding3", Uint8),
         ("data1", Sint32),
     ]
+
 
 class SDL_WindowEvent(Structure):
     _fields_ = [
@@ -187,6 +179,7 @@ class SDL_WindowEvent(Structure):
         ("data2", Sint32),
     ]
 
+
 class SDL_KeyboardEvent(Structure):
     _fields_ = [
         ("type", Uint32),
@@ -199,6 +192,7 @@ class SDL_KeyboardEvent(Structure):
         ("keysym", SDL_Keysym),
     ]
 
+
 class SDL_TextEditingEvent(Structure):
     _fields_ = [
         ("type", Uint32),
@@ -208,6 +202,7 @@ class SDL_TextEditingEvent(Structure):
         ("start", Sint32),
         ("length", Sint32),
     ]
+
 
 class SDL_TextEditingExtEvent(Structure):
     _fields_ = [
@@ -219,6 +214,7 @@ class SDL_TextEditingExtEvent(Structure):
         ("length", Sint32),
     ]
 
+
 class SDL_TextInputEvent(Structure):
     _fields_ = [
         ("type", Uint32),
@@ -226,6 +222,7 @@ class SDL_TextInputEvent(Structure):
         ("windowID", Uint32),
         ("text", (c_char * SDL_TEXTINPUTEVENT_TEXT_SIZE)),
     ]
+
 
 class SDL_MouseMotionEvent(Structure):
     _fields_ = [
@@ -240,6 +237,7 @@ class SDL_MouseMotionEvent(Structure):
         ("yrel", Sint32),
     ]
 
+
 class SDL_MouseButtonEvent(Structure):
     _fields_ = [
         ("type", Uint32),
@@ -253,6 +251,7 @@ class SDL_MouseButtonEvent(Structure):
         ("x", Sint32),
         ("y", Sint32),
     ]
+
 
 _mousewheel_fields = [
     ("type", Uint32),
@@ -273,128 +272,11 @@ if sdl_version >= 2260:
         ("mouseX", Sint32),
         ("mouseY", Sint32)
     ]
+
+
 class SDL_MouseWheelEvent(Structure):
     _fields_ = _mousewheel_fields
 
-class SDL_JoyAxisEvent(Structure):
-    _fields_ = [
-        ("type", Uint32),
-        ("timestamp", Uint32),
-        ("which", SDL_JoystickID),
-        ("axis", Uint8),
-        ("padding1", Uint8),
-        ("padding2", Uint8),
-        ("padding3", Uint8),
-        ("value", Sint16),
-        ("padding4", Uint16),
-    ]
-
-class SDL_JoyBallEvent(Structure):
-    _fields_ = [
-        ("type", Uint32),
-        ("timestamp", Uint32),
-        ("which", SDL_JoystickID),
-        ("ball", Uint8),
-        ("padding1", Uint8),
-        ("padding2", Uint8),
-        ("padding3", Uint8),
-        ("xrel", Sint16),
-        ("yrel", Sint16),
-    ]
-
-class SDL_JoyHatEvent(Structure):
-    _fields_ = [
-        ("type", Uint32),
-        ("timestamp", Uint32),
-        ("which", SDL_JoystickID),
-        ("hat", Uint8),
-        ("value", Uint8),
-        ("padding1", Uint8),
-        ("padding2", Uint8),
-    ]
-
-class SDL_JoyButtonEvent(Structure):
-    _fields_ = [
-        ("type", Uint32),
-        ("timestamp", Uint32),
-        ("which", SDL_JoystickID),
-        ("button", Uint8),
-        ("state", Uint8),
-        ("padding1", Uint8),
-        ("padding2", Uint8),
-    ]
-
-class SDL_JoyDeviceEvent(Structure):
-    _fields_ = [
-        ("type", Uint32),
-        ("timestamp", Uint32),
-        ("which", Sint32),
-    ]
-
-class SDL_JoyBatteryEvent(Structure):
-    _fields_ = [
-        ("type", Uint32),
-        ("timestamp", Uint32),
-        ("which", SDL_JoystickID),
-        ("level", SDL_JoystickPowerLevel),
-    ]
-
-class SDL_ControllerAxisEvent(Structure):
-    _fields_ = [
-        ("type", Uint32),
-        ("timestamp", Uint32),
-        ("which", SDL_JoystickID),
-        ("axis", Uint8),
-        ("padding1", Uint8),
-        ("padding2", Uint8),
-        ("padding3", Uint8),
-        ("value", Sint16),
-        ("padding4", Uint16),
-    ]
-
-class SDL_ControllerButtonEvent(Structure):
-    _fields_ = [
-        ("type", Uint32),
-        ("timestamp", Uint32),
-        ("which", SDL_JoystickID),
-        ("button", Uint8),
-        ("state", Uint8),
-        ("padding1", Uint8),
-        ("padding2", Uint8),
-    ]
-
-class SDL_ControllerDeviceEvent(Structure):
-    _fields_ = [
-        ("type", Uint32),
-        ("timestamp", Uint32),
-        ("which", Sint32),
-    ]
-
-class SDL_ControllerTouchpadEvent(Structure):
-    _fields_ = [
-        ("type", Uint32),
-        ("timestamp", Uint32),
-        ("which", SDL_JoystickID),
-        ("touchpad", Sint32),
-        ("finger", Sint32),
-        ("x", c_float),
-        ("y", c_float),
-        ("pressure", c_float),
-    ]
-
-_controller_sensor_fields = [
-    ("type", Uint32),
-    ("timestamp", Uint32),
-    ("which", SDL_JoystickID),
-    ("sensor", Sint32),
-    ("data", c_float * 3),
-]
-if sdl_version >= 2260:
-    _controller_sensor_fields += [
-        ("timestamp_us", Uint64)
-    ]
-class SDL_ControllerSensorEvent(Structure):
-    _fields_ = _controller_sensor_fields
 
 class SDL_AudioDeviceEvent(Structure):
     _fields_ = [
@@ -407,46 +289,6 @@ class SDL_AudioDeviceEvent(Structure):
         ("padding3", Uint8),
     ]
 
-_touchfinger_fields = [
-    ("type", Uint32),
-    ("timestamp", Uint32),
-    ("touchId", SDL_TouchID),
-    ("fingerId", SDL_FingerID),
-    ("x", c_float),
-    ("y", c_float),
-    ("dx", c_float),
-    ("dy", c_float),
-    ("pressure", c_float),
-]
-if sdl_version >= 2012:
-    _touchfinger_fields += [("windowID", Uint32)]
-class SDL_TouchFingerEvent(Structure):
-    _fields_ = _touchfinger_fields
-
-class SDL_MultiGestureEvent(Structure):
-    _fields_ = [
-        ("type", Uint32),
-        ("timestamp", Uint32),
-        ("touchId", SDL_TouchID),
-        ("dTheta", c_float),
-        ("dDist", c_float),
-        ("x", c_float),
-        ("y", c_float),
-        ("numFingers", Uint16),
-        ("padding", Uint16),
-    ]
-
-class SDL_DollarGestureEvent(Structure):
-    _fields_ = [
-        ("type", Uint32),
-        ("timestamp", Uint32),
-        ("touchId", SDL_TouchID),
-        ("gestureId", SDL_GestureID),
-        ("numFingers", Uint32),
-        ("error", c_float),
-        ("x", c_float),
-        ("y", c_float),
-    ]
 
 class SDL_DropEvent(Structure):
     _fields_ = [
@@ -455,6 +297,7 @@ class SDL_DropEvent(Structure):
         ("file", c_char_p),
         ("windowID", Uint32),
     ]
+
 
 _sensor_fields = [
     ("type", Uint32),
@@ -466,8 +309,11 @@ if sdl_version >= 2260:
     _sensor_fields += [
         ("timestamp_us", Uint64)
     ]
+
+
 class SDL_SensorEvent(Structure):
     _fields_ = _sensor_fields
+
 
 class SDL_QuitEvent(Structure):
     _fields_ = [
@@ -475,11 +321,13 @@ class SDL_QuitEvent(Structure):
         ("timestamp", Uint32),
     ]
 
+
 class SDL_OSEvent(Structure):
     _fields_ = [
         ("type", Uint32),
         ("timestamp", Uint32),
     ]
+
 
 class SDL_UserEvent(Structure):
     _fields_ = [
@@ -491,16 +339,11 @@ class SDL_UserEvent(Structure):
         ("data2", c_void_p),
     ]
 
-class SDL_SysWMEvent(Structure):
-    _fields_ = [
-        ("type", Uint32),
-        ("timestamp", Uint32),
-        ("msg", _P(SDL_SysWMmsg)),
-    ]
 
 _event_pad_size = 56 if sizeof(c_void_p) <= 8 else 64
 if sizeof(c_void_p) > 16:
     _event_pad_size = 3 * sizeof(c_void_p)
+
 
 class SDL_Event(Union):
     _fields_ = [
@@ -515,25 +358,10 @@ class SDL_Event(Union):
         ("motion", SDL_MouseMotionEvent),
         ("button", SDL_MouseButtonEvent),
         ("wheel", SDL_MouseWheelEvent),
-        ("jaxis", SDL_JoyAxisEvent),
-        ("jball", SDL_JoyBallEvent),
-        ("jhat", SDL_JoyHatEvent),
-        ("jbutton", SDL_JoyButtonEvent),
-        ("jdevice", SDL_JoyDeviceEvent),
-        ("jbattery", SDL_JoyBatteryEvent),
-        ("caxis", SDL_ControllerAxisEvent),
-        ("cbutton", SDL_ControllerButtonEvent),
-        ("cdevice", SDL_ControllerDeviceEvent),
-        ("ctouchpad", SDL_ControllerTouchpadEvent),
-        ("csensor", SDL_ControllerSensorEvent),
         ("adevice", SDL_AudioDeviceEvent),
         ("sensor", SDL_SensorEvent),
         ("quit", SDL_QuitEvent),
         ("user", SDL_UserEvent),
-        ("syswm", SDL_SysWMEvent),
-        ("tfinger", SDL_TouchFingerEvent),
-        ("mgesture", SDL_MultiGestureEvent),
-        ("dgesture", SDL_DollarGestureEvent),
         ("drop", SDL_DropEvent),
         ("padding", (Uint8 * _event_pad_size)),
     ]
@@ -548,7 +376,8 @@ SDL_EventFilter = CFUNCTYPE(c_int, c_void_p, _P(SDL_Event))
 
 _funcdefs = [
     SDLFunc("SDL_PumpEvents"),
-    SDLFunc("SDL_PeepEvents", [_P(SDL_Event), c_int, SDL_eventaction, Uint32, Uint32], c_int),
+    SDLFunc("SDL_PeepEvents", [_P(SDL_Event), c_int,
+            SDL_eventaction, Uint32, Uint32], c_int),
     SDLFunc("SDL_HasEvent", [Uint32], SDL_bool),
     SDLFunc("SDL_HasEvents", [Uint32, Uint32], SDL_bool),
     SDLFunc("SDL_FlushEvent", [Uint32]),
@@ -558,7 +387,8 @@ _funcdefs = [
     SDLFunc("SDL_WaitEventTimeout", [_P(SDL_Event), c_int], c_int),
     SDLFunc("SDL_PushEvent", [_P(SDL_Event)], c_int),
     SDLFunc("SDL_SetEventFilter", [SDL_EventFilter, c_void_p]),
-    SDLFunc("SDL_GetEventFilter", [_P(SDL_EventFilter), _P(c_void_p)], SDL_bool),
+    SDLFunc("SDL_GetEventFilter", [
+            _P(SDL_EventFilter), _P(c_void_p)], SDL_bool),
     SDLFunc("SDL_AddEventWatch", [SDL_EventFilter, c_void_p]),
     SDLFunc("SDL_DelEventWatch", [SDL_EventFilter, c_void_p]),
     SDLFunc("SDL_FilterEvents", [SDL_EventFilter, c_void_p]),
@@ -568,7 +398,7 @@ _funcdefs = [
 _ctypes = AttributeDict()
 for f in _funcdefs:
     _ctypes[f.name] = _bind(f.name, f.args, f.returns, f.added)
-    __all__.append(f.name) # Add all bound functions to module namespace
+    __all__.append(f.name)  # Add all bound functions to module namespace
 
 
 # Aliases for ctypes bindings
@@ -589,7 +419,9 @@ SDL_AddEventWatch = _ctypes["SDL_AddEventWatch"]
 SDL_DelEventWatch = _ctypes["SDL_DelEventWatch"]
 SDL_FilterEvents = _ctypes["SDL_FilterEvents"]
 SDL_EventState = _ctypes["SDL_EventState"]
-SDL_GetEventState = lambda t: SDL_EventState(t, SDL_QUERY)
+def SDL_GetEventState(t): return SDL_EventState(t, SDL_QUERY)
+
+
 SDL_RegisterEvents = _ctypes["SDL_RegisterEvents"]
 
 
