@@ -20,7 +20,7 @@ class Screen:
 
         raise NotImplementedError
 
-    def text(self, font_size, text, color, wp, hp, anchor=None):
+    def text(self, font_size, text, color, wp, hp, align):
 
         raise NotImplementedError
 
@@ -135,31 +135,31 @@ class Game:
         if self.questions is None:
 
             set_name = "< " + self.set_names[self.set_index] + " >"
-            self.screen.text(50, set_name, WHITE, 0.5, 0.5)
+            self.screen.text(50, set_name, WHITE, 0.5, 0.5, 0.5)
 
         else:
 
             answers, correct = self.questions[0]
 
             correct_kanji = answers[correct]
-            self.screen.text(120, correct_kanji, WHITE, 0.2, 0.25)
+            self.screen.text(120, correct_kanji, WHITE, 0.2, 0.25, 0.5)
 
             info = self.kanji_dict[correct_kanji]
             on = "、".join(info["ons"][:3])
             kun = "、".join(info["kuns"][:3])
             pinyin = ", ".join(info["pinyins"][:3])
 
-            self.screen.text(22, pinyin, DIM_WHITE, 0.4, 0.15, "l")
-            self.screen.text(22, on, WHITE, 0.4, 0.25, "l")
-            self.screen.text(22, kun, WHITE, 0.4, 0.35, "l")
+            self.screen.text(22, pinyin, DIM_WHITE, 0.4, 0.15, 0.0)
+            self.screen.text(22, on, WHITE, 0.4, 0.25, 0.0)
+            self.screen.text(22, kun, WHITE, 0.4, 0.35, 0.0)
 
-            self.screen.text(28, "+", WHITE, 0.5, 0.7)
+            self.screen.text(28, "+", WHITE, 0.5, 0.7, 0.5)
 
             answer_coords = [
-                (0.57, 0.7, "l"),
-                (0.43, 0.7, "r"),
-                (0.5, 0.55),
-                (0.5, 0.85),
+                (0.57, 0.7, 0.0),
+                (0.43, 0.7, 1.0),
+                (0.5, 0.55, 0.5),
+                (0.5, 0.85, 0.5),
             ]
 
             for i, option_kanji in enumerate(answers):

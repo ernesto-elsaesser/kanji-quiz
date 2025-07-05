@@ -30,22 +30,19 @@ class Screen(quiz.Screen):
 
         self.display.fill((0, 0, 0))
 
-    def text(self, font_size, text, color, wp, hp, anchor=None):
+    def text(self, font_size, text, color, wp, hp, align):
 
         font = self.font_cache.get(font_size)
         if font is None:
             font = pygame.font.Font(FONT_NAME, font_size)
             self.font_cache[font_size] = font
 
-        x = self.width * wp
-        y = self.height * hp
         text_surface = font.render(text, True, color)
-        if anchor == "l":
-            rect = text_surface.get_rect(midleft=(x, y))
-        elif anchor == "r":
-            rect = text_surface.get_rect(midright=(x, y))
-        else:
-            rect = text_surface.get_rect(center=(x, y))
+        tw = text_surface.get_width()
+        th = text_surface.get_height()
+        ry = (self.height * hp) - (th * 0.5)
+        rx = (self.width * wp) - (tw * align)
+        rect = pygame.Rect(rx, ry, tw, th)
         self.display.blit(text_surface, rect)
 
     def show(self):

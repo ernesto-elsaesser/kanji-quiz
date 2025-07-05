@@ -33,7 +33,7 @@ class Screen(quiz.Screen):
 
         sdl2.ext.fill(self.surface, sdl2.ext.Color(0, 0, 0))
 
-    def text(self, font_size, text, color, wp, hp, anchor=None):
+    def text(self, font_size, text, color, wp, hp, align):
 
         font = self.font_cache.get(font_size)
         if font is None:
@@ -41,17 +41,11 @@ class Screen(quiz.Screen):
             self.font_cache[font_size] = font
 
         text_surface = font.render_text(text)
-
-        if anchor == "l":
-            hf = 0.0
-        elif anchor == "r":
-            hf = 1.0
-        else:
-            hf = 0.5
-
-        ry = (self.height * hp) - (text_surface.h * hf)
-        rx = (self.width * wp) - (text_surface.w * 0.5)
-        rect = sdl2.rect.SDL_Rect(rx, ry, text_surface.w, text_surface.h)
+        tw = text_surface.w
+        th = text_surface.h
+        ry = (self.height * hp) - (th * 0.5)
+        rx = (self.width * wp) - (tw * align)
+        rect = sdl2.rect.SDL_Rect(rx, ry, tw, th)
         sdl2.SDL_BlitSurface(text_surface, rect, self.surface, None)
 
     def show(self):
