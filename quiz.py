@@ -1,36 +1,52 @@
+import os
 import json
 import random
-import pygame
 
 
-BLACK = (0, 0, 0)
 WHITE = (200, 200, 200)
 DIM_WHITE = (150, 150, 150)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 
 
+class Screen:
+
+    def __init__(self, width, height):
+
+        self.width = width
+        self.height = height
+
+    def clear(self):
+
+        raise NotImplementedError
+
+    def latin(self, font_size, text, color, wp, hp, anchor=None):
+
+        raise NotImplementedError
+
+    def japanese(self, font_size, text, color, wp, hp, anchor=None):
+
+        raise NotImplementedError
+
+    def show(self):
+
+        raise NotImplementedError
+
+    def defer(self, callback, frames):
+
+        raise NotImplementedError
+
+
 class Game:
 
-    def __init__(self, width, height, latin_fonts, japan_fonts, sets):
+    def __init__(self, screen):
 
-        self.screen = pygame.display.set_mode((width, height))
+        self.screen = screen
 
-        self.msg_font = pygame.font.SysFont(None, 65)
-        self.message("HI")
+        self.set_files = {n[:-5]: "sets/" + n for n
+                          in sorted(os.listdir("sets"))}
 
-        font_names = pygame.font.get_fonts()
-        font_name = [n for n in latin_fonts if n in font_names][0]
-        font_name_jp = [n for n in japan_fonts if n in font_names][0]
-
-        self.menu_font = pygame.font.SysFont(font_name, 60)
-        self.meaning_font = pygame.font.SysFont(font_name, 35)
-        self.pinyin_font = pygame.font.SysFont(font_name, 28)
-        self.kanji_font = pygame.font.SysFont(font_name_jp, 135)
-        self.kana_font = pygame.font.SysFont(font_name_jp, 28)
-
-        self.set_files = sets
-        self.set_names = list(sets)
+        self.set_names = list(self.set_files)
 
         self.set_index = 0
         self.kanji_dict = {}
@@ -41,68 +57,48 @@ class Game:
 
         self.draw()
 
-    def run(self):
+    def press(self, key):
 
-        while True:
-            for event in pygame.event.get():
-                if event.type == pygame.KEYDOWN:
+        if self.questions is None:
 
-                    if event.key == pygame.K_h:
-                        self.function_pressed = True
-                    elif event.key == pygame.K_RETURN:
-                        if self.function_pressed:
-                            self.message("BYE")
-                            return
-                    elif event.key == pygame.K_ESCAPE:
-                        return
+            if key == "LEFT":
+                self.set_index -= 1
+            elif key == "RIGHT":
+                self.set_index += 1
+            elif key == "START":
+                self.load_set()
 
-                    if self.questions is None:
+            self.set_index %= len(self.set_names)
+        else:
 
-                        if event.key == pygame.K_LEFT:
-                            self.set_index -= 1
-                        elif event.key == pygame.K_RIGHT:
-                            self.set_index += 1
-                        elif event.key == pygame.K_RETURN:
-                            self.load_set()
+            correct = self.questions[0][1]
 
-                        self.set_index %= len(self.set_names)
-                    else:
+            if key in {"X", "UP"}:
+                self.selected = 2
+            if key in {"Y", "LEFT"}:
+                self.selected = 1
+            if key in {"A", "RIGHT"}:
+                self.selected = 0
+            if key in {"B", "DOWN"}:
+                self.selected = 3
+            if key == "START":
+                self.questions = None
 
-                        correct = self.questions[0][1]
+            if self.selected == correct:
+                self.screen.defer(self.next_question, 4)
 
-                        if event.key in {pygame.K_x, pygame.K_UP}:
-                            self.selected = 2
-                        if event.key in {pygame.K_y, pygame.K_LEFT}:
-                            self.selected = 1
-                        if event.key in {pygame.K_a, pygame.K_RIGHT}:
-                            self.selected = 0
-                        if event.key in {pygame.K_b, pygame.K_DOWN}:
-                            self.selected = 3
-                        if event.key == pygame.K_RETURN:
-                            self.questions = None
+        self.draw()
 
-                        if self.selected == correct:
-                            self.frames_to_next = 4
+    def next_question(self):
 
-                    self.draw()
+        self.selected = None
 
-                elif event.type == pygame.KEYUP:
-                    if event.key == pygame.K_h:
-                        self.function_pressed = False
+        if self.questions is not None:
+            self.questions.pop(0)
+            if len(self.questions) == 0:
+                self.questions = None
 
-            if self.frames_to_next is not None:
-                if self.frames_to_next == 0:
-                    self.frames_to_next = None
-                    self.selected = None
-                    assert self.questions is not None
-                    self.questions.pop(0)
-                    if len(self.questions) == 0:
-                        self.questions = None
-                    self.draw()
-                else:
-                    self.frames_to_next -= 1
-
-            pygame.time.Clock().tick(10)
+        self.draw()
 
     def load_set(self):
 
@@ -128,30 +124,30 @@ class Game:
 
     def draw(self):
 
-        self.screen.fill(BLACK)
+        self.screen.clear()
 
         if self.questions is None:
 
             set_name = "< " + self.set_names[self.set_index] + " >"
-            self.draw_text(self.menu_font, set_name, WHITE, 0.5, 0.5)
+            self.screen.latin(60, set_name, WHITE, 0.5, 0.5)
 
         else:
 
             answers, correct = self.questions[0]
 
             correct_kanji = answers[correct]
-            self.draw_text(self.kanji_font, correct_kanji, WHITE, 0.2, 0.25)
+            self.screen.japanese(135, correct_kanji, WHITE, 0.2, 0.25)
 
             info = self.kanji_dict[correct_kanji]
             on = "、".join(info["ons"][:3])
             kun = "、".join(info["kuns"][:3])
             pinyin = ", ".join(info["pinyins"][:3])
 
-            self.draw_text(self.pinyin_font, pinyin, DIM_WHITE, 0.4, 0.15, "l")
-            self.draw_text(self.kana_font, on, WHITE, 0.4, 0.25, "l")
-            self.draw_text(self.kana_font, kun, WHITE, 0.4, 0.35, "l")
+            self.screen.latin(28, pinyin, DIM_WHITE, 0.4, 0.15, "l")
+            self.screen.japanese(28, on, WHITE, 0.4, 0.25, "l")
+            self.screen.japanese(28, kun, WHITE, 0.4, 0.35, "l")
 
-            self.draw_text(self.meaning_font, "+", WHITE, 0.5, 0.7)
+            self.screen.latin(35, "+", WHITE, 0.5, 0.7)
 
             answer_coords = [
                 (0.57, 0.7, "l"),
@@ -169,26 +165,6 @@ class Game:
                         color = GREEN
                     else:
                         color = RED
-                self.draw_text(self.meaning_font, meaning,
-                               color, *answer_coords[i])
+                self.screen.latin(35, meaning, color, *answer_coords[i])
 
-        pygame.display.flip()
-
-    def message(self, text):
-
-        self.screen.fill(BLACK)
-        self.draw_text(self.msg_font, text, WHITE, 0.5, 0.5)
-        pygame.display.flip()
-
-    def draw_text(self, font, text, color, wp, hp, anchor=None):
-
-        x = self.screen.get_width() * wp
-        y = self.screen.get_height() * hp
-        text_surface = font.render(text, True, color)
-        if anchor == "l":
-            rect = text_surface.get_rect(midleft=(x, y))
-        elif anchor == "r":
-            rect = text_surface.get_rect(midright=(x, y))
-        else:
-            rect = text_surface.get_rect(center=(x, y))
-        self.screen.blit(text_surface, rect)
+        self.screen.show()
