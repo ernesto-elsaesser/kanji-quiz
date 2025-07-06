@@ -32,8 +32,8 @@ JBUTTON_MAP = {
     1: "B",
     2: "X",
     3: "Y",
-    6: "START",
-    # 7 = SELECT
+    7: "START",
+    # 6 = SELECT
     # 8 = MENU
     # 11 = POWER?
 }
@@ -47,8 +47,6 @@ wsurf = SDL_GetWindowSurface(window)
 ww = wsurf.contents.w
 wh = wsurf.contents.h
 wrect = SDL_Rect(0, 0, ww, wh)
-
-# SDL_JoystickEventState(SDL_ENABLE)
 
 TTF_Init()
 
@@ -65,6 +63,10 @@ def show_text(texts):
         fg = SDL_Color(*color)
         utf8_bytes = text.encode('utf-8')
         tsurf = TTF_RenderUTF8_Blended(font, utf8_bytes, fg)
+        if not tsurf:
+            err = SDL_GetError()
+            print("FONT RENDER ERROR", text, font_size, err)
+            continue
         tw = tsurf.contents.w
         th = tsurf.contents.h
         rx = (ww * wp) - (tw * align)
