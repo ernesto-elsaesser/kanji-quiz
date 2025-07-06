@@ -5,7 +5,7 @@ from pysdl.sdlttf import *
 import quiz
 
 
-VERSION = 8
+VERSION = 9
 FONT_PATH = b"DejaVuSansMono.ttf"
 
 SCANCODE_MAP = {
@@ -20,13 +20,26 @@ SCANCODE_MAP = {
     SDL_SCANCODE_RETURN: "START",
 }
 
-JOYSTICK_MAP = {
-    0: "LEFT",
-    1: "RIGHT",
-    2: "START",
+JHAT_MAP = {
+    SDL_HAT_LEFT: "LEFT",
+    SDL_HAT_RIGHT: "RIGHT",
+    SDL_HAT_UP: "UP",
+    SDL_HAT_DOWN: "DOWN",
+}
+
+JBUTTON_MAP = {
+    0: "A",
+    1: "B",
+    2: "X",
+    3: "Y",
+    6: "START",
+    # 7 = SELECT
+    # 8 = MENU
+    # 11 = POWER?
 }
 
 
+# TODO: remove SDL_INIT_GAMECONTROLLER?
 SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER)
 
 window = SDL_CreateWindow(b"Kanji Quiz", 0, 0, 640, 480, SDL_WINDOW_SHOWN)
@@ -35,10 +48,7 @@ ww = wsurf.contents.w
 wh = wsurf.contents.h
 wrect = SDL_Rect(0, 0, ww, wh)
 
-# TODO: redundant?
-is_enabled = SDL_JoystickEventState(SDL_QUERY)
-print("SDL_JoystickEventState", is_enabled)
-SDL_JoystickEventState(SDL_ENABLE)
+# SDL_JoystickEventState(SDL_ENABLE)
 
 TTF_Init()
 
@@ -79,12 +89,13 @@ while running:
         if event.type == SDL_KEYDOWN:
             print("KEYDOWN EVENT")
             code = event.key.keysym.scancode
-            key = SCANCODE_MAP.get(code)
-            print("- KEY", code, key)
-            if key is None:
+            if code in (SDL_SCANCODE_POWER, SDL_SCANCODE_ESCAPE):
+                print("- ESCAPE")
                 running = False
                 break
-            else:
+            key = SCANCODE_MAP.get(code)
+            print("- KEY", code, key)
+            if key is not None:
                 game.press(key)
         elif event.type == SDL_KEYUP:
             print("KEYUP EVENT")
@@ -93,16 +104,22 @@ while running:
         elif event.type == SDL_JOYDEVICEADDED:
             print("JDEVICE EVENT", event.jdevice.which)
             jstick = SDL_JoystickOpen(event.jdevice.which)
-            err = SDL_GetError()
-            if err:
-                print("JOYSTICK ERROR", err)
+        elif event.type == SDL_JOYHATMOTION:
+            print("JOYHATMOTION EVENT")
+            dir = event.jhat.value
+            key = JHAT_MAP.get(dir)
+            print("- DIR", dir, key)
+            if key is not None:
+                game.press(key)
         elif event.type == SDL_JOYBUTTONDOWN:
             print("JOYBUTTONDOWN EVENT")
             button = event.jbutton.button
-            key = JOYSTICK_MAP.get(button)
+            key = JBUTTON_MAP.get(button)
             print("- BUTTON", button, key)
             if key is not None:
                 game.press(key)
+        elif event.type == SDL_JOYBUTTONUP:
+            print("JOYBUTTONUP EVENT")
         elif event.type == SDL_QUIT:
             print("QUIT EVENT")
             running = False
