@@ -1,9 +1,11 @@
 import time
 import ctypes
 from pysdl import *
+from pysdl.sdlttf import *
 import quiz
 
 
+VERSION = 8
 FONT_PATH = b"DejaVuSansMono.ttf"
 
 SCANCODE_MAP = {
@@ -19,7 +21,7 @@ SCANCODE_MAP = {
 }
 
 
-SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS)
+SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK)
 
 window = SDL_CreateWindow(b"Kanji Quiz", 0, 0, 640, 480, SDL_WINDOW_SHOWN)
 wsurf = SDL_GetWindowSurface(window)
@@ -27,9 +29,9 @@ ww = wsurf.contents.w
 wh = wsurf.contents.h
 wrect = SDL_Rect(0, 0, ww, wh)
 
-ttf.TTF_Init()
+TTF_Init()
 
-font = ttf.TTF_OpenFont(FONT_PATH, 16)
+font = TTF_OpenFont(FONT_PATH, 16)
 
 
 def show_text(texts):
@@ -57,6 +59,8 @@ game = quiz.Game(show_text)
 running = True
 event = SDL_Event()
 
+print("START", VERSION)
+
 while running:
     while SDL_PollEvent(ctypes.byref(event)) != 0:
 
@@ -72,6 +76,8 @@ while running:
                 game.press(key)
         elif event.type == SDL_KEYUP:
             print("KEYUP EVENT")
+        elif event.type == SDL_WINDOWEVENT:
+            print("WINDOW EVENT", event.window.event)
         elif event.type == SDL_QUIT:
             print("QUIT EVENT")
             running = False
@@ -79,7 +85,7 @@ while running:
         else:
             print("OTHER EVENT", event.type)
 
-    time.sleep(0.1)
+    SDL_Delay(100)
     game.tick()
 
 print("EXIT")
