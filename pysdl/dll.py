@@ -38,13 +38,11 @@ def nullfunc(*args):
     """A simple no-op function to be used as dll replacement."""
     return
 
-
 def _unavailable(err):
     """A wrapper that raises a RuntimeError if a function is not supported."""
     def wrapper(*fargs, **kw):
         raise RuntimeError(err)
     return wrapper
-
 
 def _nonexistent(funcname, func):
     """A simple wrapper to mark functions and methods as nonexistent."""
@@ -66,7 +64,6 @@ class SDL_version(Structure):
         ("patch", c_uint8),
     ]
 
-
 def _version_tuple_to_int(v):
     # Convert a tuple to an integer (e.g. (2,0,18) to 2018, (2,24,1) to 2241)
     if v[1] > 99:
@@ -85,18 +82,16 @@ def _version_tuple_to_int(v):
         # This is the same encoding as SDL_VERSIONNUM.
         return v[0] * 1000 + v[1] * 100 + v[2]
 
-
 def _version_tuple_to_str(v):
     return ".".join(map(str, v))
-
 
 def _version_str_to_tuple(s):
     return tuple(map(int, s.split('.')))
 
-
 def _so_version_num(libname):
     """Extracts the version number from an .so filename as a list of ints."""
     return list(map(int, libname.split('.so.')[1].split('.')))
+
 
 
 # Functions for allowing Microsoft Store Python to load image/ttf/mixer
@@ -108,7 +103,7 @@ def _using_ms_store_python():
 
 def _preload_deps(libname, dllpath):
     """Preloads all DLLs that SDL2 and its extensions link to (e.g. libFLAC).
-
+    
     This is required for Python installed from the Microsoft Store, which has
     strict DLL loading rules but will allow loading of DLLs that have already
     been loaded by the current process.
@@ -137,7 +132,7 @@ def _preload_deps(libname, dllpath):
 
     if len(preloaded) < len(deps[libname]):
         e = ("Unable to preload all dependencies for {0}. This module may not "
-             "work correctly.")
+            "work correctly.")
         prettywarn(e.format(libname), RuntimeWarning)
 
     return preloaded
@@ -172,7 +167,7 @@ def _finds_libs_at_path(libnames, path, patterns):
                 dllname = "lib{0}.so".format(libname)
                 if dllname in f and not (dllname == f or f.startswith(".")):
                     versioned.append(os.path.join(path, f))
-        versioned.sort(key=_so_version_num, reverse=True)
+        versioned.sort(key = _so_version_num, reverse = True)
         results = results + versioned
 
     return results
@@ -190,8 +185,7 @@ def _findlib(libnames, path=None):
     if platform == "win32":
         patterns = ["{0}.dll"]
     elif platform == "darwin":
-        patterns = ["lib{0}.dylib", "{0}.framework/{0}",
-                    "{0}.framework/Versions/A/{0}"]
+        patterns = ["lib{0}.dylib", "{0}.framework/{0}", "{0}.framework/Versions/A/{0}"]
     else:
         patterns = ["lib{0}.so"]
 
@@ -241,7 +235,6 @@ class DLL(object):
     """Function wrapper around the different DLL functions. Do not use or
     instantiate this one directly from your user code.
     """
-
     def __init__(self, libinfo, libnames, path=None):
         self._dll = None
         self._deps = None
@@ -255,8 +248,7 @@ class DLL(object):
             "SDL2_gfx": (1, 0, 3)
         }
         foundlibs = _findlib(libnames, path)
-        dllmsg = "PYSDL2_DLL_PATH: %s" % (
-            os.getenv("PYSDL2_DLL_PATH") or "unset")
+        dllmsg = "PYSDL2_DLL_PATH: %s" % (os.getenv("PYSDL2_DLL_PATH") or "unset")
         if len(foundlibs) == 0:
             raise RuntimeError("could not find any library for %s (%s)" %
                                (libinfo, dllmsg))
@@ -264,8 +256,7 @@ class DLL(object):
             try:
                 self._dll = CDLL(libfile)
                 self._libfile = libfile
-                self._version_tuple = self._get_version_tuple(
-                    libinfo, self._dll)
+                self._version_tuple = self._get_version_tuple(libinfo, self._dll)
                 if self._version_tuple < minversions[libinfo]:
                     versionstr = _version_tuple_to_str(self._version_tuple)
                     minimumstr = _version_tuple_to_str(minversions[libinfo])
@@ -286,7 +277,7 @@ class DLL(object):
         if _using_ms_store_python():
             self._deps = _preload_deps(libinfo, self._libfile)
         if path is not None and sys.platform in ("win32",) and \
-                path in self._libfile:
+            path in self._libfile:
             os.environ["PATH"] = "%s;%s" % (path, os.environ["PATH"])
 
     def bind_function(self, funcname, args=None, returns=None, added=None):
@@ -294,7 +285,7 @@ class DLL(object):
         function. If the version of the loaded library is older than the
         version where the function was added, an informative exception will
         be raised if the bound function is called.
-
+        
         Args:
             funcname (str): The name of the function to bind.
             args (List or None, optional): The data types of the C function's 
@@ -334,8 +325,7 @@ class DLL(object):
             elif libname == "SDL2_image":
                 func = dll.IMG_Linked_Version
             elif libname == "SDL2_gfx":
-                # not supported in SDL2_gfx, so just assume latest
-                return (1, 0, 4)
+                return (1, 0, 4) # not supported in SDL2_gfx, so just assume latest
             func.argtypes = None
             func.restype = POINTER(SDL_version)
             v = func().contents
@@ -369,16 +359,13 @@ class DLL(object):
 # Once the DLL class is defined, try loading the main SDL2 library
 
 try:
-    dll = DLL("SDL2", ["SDL2", "SDL2-2.0", "SDL2-2.0.0"],
-              os.getenv("PYSDL2_DLL_PATH"))
+    dll = DLL("SDL2", ["SDL2", "SDL2-2.0", "SDL2-2.0.0"], os.getenv("PYSDL2_DLL_PATH"))
 except RuntimeError as exc:
     raise ImportError(exc)
-
 
 def get_dll_file():
     """Gets the file name of the loaded SDL2 library."""
     return dll.libfile
-
 
 _bind = dll.bind_function
 version = dll.version

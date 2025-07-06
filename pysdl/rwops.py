@@ -16,11 +16,10 @@ __all__ = [
     "SDL_RWOPS_UNKNOWN", "SDL_RWOPS_WINFILE", "SDL_RWOPS_STDFILE",
     "SDL_RWOPS_JNIFILE", "SDL_RWOPS_MEMORY", "SDL_RWOPS_MEMORY_RO",
     "RW_SEEK_SET", "RW_SEEK_CUR", "RW_SEEK_END",
-
+    
     # Python Functions
     "rw_from_object",
 ]
-
 
 def _ptr2obj(ptr):
     """If a pointer, returns its contents. Otherwise, returns the passed object.
@@ -49,10 +48,8 @@ RW_SEEK_END = 2
 class _hidden(Union):
     pass
 
-
 class SDL_RWops(Structure):
     pass
-
 
 _sdlsize = CFUNCTYPE(Sint64, _P(SDL_RWops))
 _sdlseek = CFUNCTYPE(Sint64, _P(SDL_RWops), Sint64, c_int)
@@ -79,20 +76,16 @@ _funcdefs = [
     SDLFunc("SDL_RWFromConstMem", [c_void_p, c_int], _P(SDL_RWops)),
     SDLFunc("SDL_AllocRW", None, _P(SDL_RWops)),
     SDLFunc("SDL_FreeRW", [_P(SDL_RWops)]),
-    SDLFunc("SDL_LoadFile_RW", [_P(SDL_RWops), _P(
-        c_size_t), c_int], c_void_p, added='2.0.6'),
-    SDLFunc("SDL_LoadFile", [c_char_p, _P(c_size_t)],
-            c_void_p, added='2.0.10'),
+    SDLFunc("SDL_LoadFile_RW", [_P(SDL_RWops), _P(c_size_t), c_int], c_void_p, added='2.0.6'),
+    SDLFunc("SDL_LoadFile", [c_char_p, _P(c_size_t)], c_void_p, added='2.0.10'),
     SDLFunc("SDL_RWsize", [_P(SDL_RWops)], Sint64, added='2.0.10'),
-    SDLFunc("SDL_RWseek", [_P(SDL_RWops), Sint64,
-            c_int], Sint64, added='2.0.10'),
+    SDLFunc("SDL_RWseek", [_P(SDL_RWops), Sint64, c_int], Sint64, added='2.0.10'),
     SDLFunc("SDL_RWtell", [_P(SDL_RWops)], Sint64, added='2.0.10'),
-    SDLFunc("SDL_RWread", [_P(SDL_RWops), c_void_p,
-            c_size_t, c_size_t], c_size_t, added='2.0.10'),
+    SDLFunc("SDL_RWread", [_P(SDL_RWops), c_void_p, c_size_t, c_size_t], c_size_t, added='2.0.10'),
     SDLFunc("SDL_RWwrite",
-            [_P(SDL_RWops), c_void_p, c_size_t, c_size_t],
-            returns=c_size_t, added='2.0.10'
-            ),
+        [_P(SDL_RWops), c_void_p, c_size_t, c_size_t],
+        returns = c_size_t, added = '2.0.10'
+    ),
     SDLFunc("SDL_RWclose", [_P(SDL_RWops)], c_int, added='2.0.10'),
     SDLFunc("SDL_ReadU8", [_P(SDL_RWops)], Uint8),
     SDLFunc("SDL_ReadLE16", [_P(SDL_RWops)], Uint16),
@@ -112,7 +105,7 @@ _funcdefs = [
 _ctypes = AttributeDict()
 for f in _funcdefs:
     _ctypes[f.name] = _bind(f.name, f.args, f.returns, f.added)
-    __all__.append(f.name)  # Add all bound functions to module namespace
+    __all__.append(f.name) # Add all bound functions to module namespace
 
 
 # Aliases for ctypes bindings
@@ -129,8 +122,7 @@ SDL_LoadFile_RW = _ctypes["SDL_LoadFile_RW"]
 if version >= 2010:
     SDL_LoadFile = _ctypes["SDL_LoadFile"]
 else:
-    def SDL_LoadFile(fname, ds): return SDL_LoadFile_RW(
-        SDL_RWFromFile(fname, b"rb"), ds, 1)
+    SDL_LoadFile = lambda fname, ds: SDL_LoadFile_RW(SDL_RWFromFile(fname, b"rb"), ds, 1)
 
 # The following set of functions were macros in SDL <= 2.0.9 but became full
 # functions in SDL 2.0.10. Lambda functions are to mimic macro behaviour with
@@ -143,19 +135,13 @@ if version >= 2010:
     SDL_RWwrite = _ctypes["SDL_RWwrite"]
     SDL_RWclose = _ctypes["SDL_RWclose"]
 else:
-    _po = _ptr2obj  # allow pointers to be passed directly to these functions
-    def SDL_RWsize(ctx): return _po(ctx).size(_po(ctx))
-    def SDL_RWseek(ctx, offset, whence): return _po(
-        ctx).seek(_po(ctx), offset, whence)
-
-    def SDL_RWtell(ctx): return _po(ctx).seek(_po(ctx), 0, RW_SEEK_CUR)
-
-    def SDL_RWread(ctx, ptr, size, n): return _po(
-        ctx).read(_po(ctx), ptr, size, n)
-    def SDL_RWwrite(ctx, ptr, size, n): return _po(
-        ctx).write(_po(ctx), ptr, size, n)
-
-    def SDL_RWclose(ctx): return _po(ctx).close(_po(ctx))
+    _po = _ptr2obj # allow pointers to be passed directly to these functions
+    SDL_RWsize = lambda ctx: _po(ctx).size(_po(ctx))
+    SDL_RWseek = lambda ctx, offset, whence: _po(ctx).seek(_po(ctx), offset, whence)
+    SDL_RWtell = lambda ctx: _po(ctx).seek(_po(ctx), 0, RW_SEEK_CUR)
+    SDL_RWread = lambda ctx, ptr, size, n: _po(ctx).read(_po(ctx), ptr, size, n)
+    SDL_RWwrite = lambda ctx, ptr, size, n: _po(ctx).write(_po(ctx), ptr, size, n)
+    SDL_RWclose = lambda ctx: _po(ctx).close(_po(ctx))
 
 SDL_ReadU8 = _ctypes["SDL_ReadU8"]
 SDL_ReadLE16 = _ctypes["SDL_ReadLE16"]
@@ -178,12 +164,10 @@ SDL_WriteBE64 = _ctypes["SDL_WriteBE64"]
 
 if sys.version_info[0] >= 3:
     try:
-        from collections.abc import Callable
+	    from collections.abc import Callable
     except ImportError:
-        from collections import Callable
-
-    def callable(x): return isinstance(x, Callable)
-
+	    from collections import Callable
+    callable = lambda x: isinstance(x, Callable)
 
 def rw_from_object(obj):
     """Creats a SDL_RWops from any Python object.
@@ -252,7 +236,7 @@ def rw_from_object(obj):
                 obj.seek(cur, RW_SEEK_SET)
                 return length
         except Exception:
-            # print(e)
+            #print(e)
             return -1
     rwops.size = _sdlsize(_rwsize)
 
@@ -263,7 +247,7 @@ def rw_from_object(obj):
                 retval = obj.tell()
             return retval
         except Exception:
-            # print(e)
+            #print(e)
             return -1
     rwops.seek = _sdlseek(_rwseek)
 
@@ -274,7 +258,7 @@ def rw_from_object(obj):
             memmove(ptr, data, num)
             return num // size
         except Exception:
-            # print(e)
+            #print(e)
             return 0
     rwops.read = _sdlread(_rwread)
 
@@ -286,7 +270,7 @@ def rw_from_object(obj):
                 return 0
             return retval
         except Exception:
-            # print(e)
+            #print(e)
             return -1
     rwops.close = _sdlclose(_rwclose)
 
@@ -295,7 +279,7 @@ def rw_from_object(obj):
             # string_at feels wrong, since we access a raw byte buffer...
             retval = obj.write(string_at(ptr, size * num))
             if issubclass(type(obj), io.IOBase):
-                if retval is None:  # Means write error
+                if retval is None: # Means write error
                     return 0
                 return retval // size
             # If not an io object, try to interpret retval as bytes written
@@ -306,7 +290,7 @@ def rw_from_object(obj):
             except TypeError:
                 return num
         except Exception:
-            # print(e)
+            #print(e)
             return 0
 
     if hasattr(obj, "write") and callable(obj.write):

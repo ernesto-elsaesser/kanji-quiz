@@ -78,7 +78,7 @@ __all__ = [
     "SDL_PIXELFLAG", "SDL_PIXELTYPE", "SDL_PIXELORDER", "SDL_PIXELLAYOUT",
     "SDL_BITSPERPIXEL", "SDL_BYTESPERPIXEL", "SDL_ISPIXELFORMAT_FOURCC",
     "SDL_ISPIXELFORMAT_INDEXED", "SDL_ISPIXELFORMAT_PACKED",
-    "SDL_ISPIXELFORMAT_ARRAY", "SDL_ISPIXELFORMAT_ALPHA",
+    "SDL_ISPIXELFORMAT_ARRAY","SDL_ISPIXELFORMAT_ALPHA",
 
     # Convenience Variables
     "NAME_MAP", "ALL_PIXELFORMATS",
@@ -147,22 +147,19 @@ SDL_PACKEDLAYOUT_1010102 = 8
 def SDL_FOURCC(a, b, c, d):
     return (ord(a) << 0) | (ord(b) << 8) | (ord(c) << 16) | (ord(d) << 24)
 
-
 def SDL_DEFINE_PIXELFORMAT(ptype, order, layout, bits, pbytes):
     return (
         (1 << 28) | ((ptype) << 24) | ((order) << 20) | ((layout) << 16) |
         ((bits) << 8) | ((pbytes) << 0)
     )
 
-
 SDL_DEFINE_PIXELFOURCC = SDL_FOURCC
-def SDL_PIXELFLAG(X): return (((X) >> 28) & 0x0F)
-def SDL_PIXELTYPE(X): return (((X) >> 24) & 0x0F)
-def SDL_PIXELORDER(X): return (((X) >> 20) & 0x0F)
-def SDL_PIXELLAYOUT(X): return (((X) >> 16) & 0x0F)
-def SDL_BITSPERPIXEL(X): return (((X) >> 8) & 0xFF)
-def SDL_ISPIXELFORMAT_FOURCC(fmt): return ((fmt) and (SDL_PIXELFLAG(fmt) != 1))
-
+SDL_PIXELFLAG = lambda X: (((X) >> 28) & 0x0F)
+SDL_PIXELTYPE = lambda X: (((X) >> 24) & 0x0F)
+SDL_PIXELORDER = lambda X: (((X) >> 20) & 0x0F)
+SDL_PIXELLAYOUT = lambda X: (((X) >> 16) & 0x0F)
+SDL_BITSPERPIXEL = lambda X: (((X) >> 8) & 0xFF)
+SDL_ISPIXELFORMAT_FOURCC = lambda fmt: ((fmt) and (SDL_PIXELFLAG(fmt) != 1))
 
 def SDL_BYTESPERPIXEL(x):
     valid = (SDL_PIXELFORMAT_YUY2, SDL_PIXELFORMAT_UYVY, SDL_PIXELFORMAT_YVYU)
@@ -174,7 +171,6 @@ def SDL_BYTESPERPIXEL(x):
     else:
         return (((x) >> 0) & 0xFF)
 
-
 def SDL_ISPIXELFORMAT_INDEXED(pformat):
     """Checks, if the passed format value is an indexed format."""
     return (
@@ -185,7 +181,6 @@ def SDL_ISPIXELFORMAT_INDEXED(pformat):
             (SDL_PIXELTYPE(pformat) == SDL_PIXELTYPE_INDEX8)
         ))
 
-
 def SDL_ISPIXELFORMAT_PACKED(pformat):
     """Checks, if the passed format value is a packed format."""
     return (
@@ -194,7 +189,6 @@ def SDL_ISPIXELFORMAT_PACKED(pformat):
             (SDL_PIXELTYPE(pformat) == SDL_PIXELTYPE_PACKED16) or
             (SDL_PIXELTYPE(pformat) == SDL_PIXELTYPE_PACKED32)
         ))
-
 
 def SDL_ISPIXELFORMAT_ARRAY(pformat):
     """Checks, if the passed format value is an array format."""
@@ -207,7 +201,6 @@ def SDL_ISPIXELFORMAT_ARRAY(pformat):
             (SDL_PIXELTYPE(pformat) == SDL_PIXELTYPE_ARRAYF32)
         ))
 
-
 def SDL_ISPIXELFORMAT_ALPHA(pformat):
     """Checks, if the passed format value is an alpha channel supporting
     format.
@@ -218,13 +211,13 @@ def SDL_ISPIXELFORMAT_ALPHA(pformat):
             (SDL_PIXELORDER(pformat) == SDL_PACKEDORDER_RGBA) or
             (SDL_PIXELORDER(pformat) == SDL_PACKEDORDER_ABGR) or
             (SDL_PIXELORDER(pformat) == SDL_PACKEDORDER_BGRA))
-    ) or (
+        ) or (
         SDL_ISPIXELFORMAT_ARRAY(pformat) and (
             (SDL_PIXELORDER(pformat) == SDL_ARRAYORDER_ARGB) or
             (SDL_PIXELORDER(pformat) == SDL_ARRAYORDER_RGBA) or
             (SDL_PIXELORDER(pformat) == SDL_ARRAYORDER_ABGR) or
             (SDL_PIXELORDER(pformat) == SDL_ARRAYORDER_BGRA))
-    ))
+        ))
 
 
 # Pixel format defintions
@@ -519,9 +512,7 @@ class SDL_Color(Structure):
         return self.r != color.r or self.g != color.g or self.b != color.b or \
             self.a != color.a
 
-
 SDL_Colour = SDL_Color
-
 
 class SDL_Palette(Structure):
     _fields_ = [
@@ -531,11 +522,8 @@ class SDL_Palette(Structure):
         ("refcount", c_int),
     ]
 
-
 class SDL_PixelFormat(Structure):
     pass
-
-
 SDL_PixelFormat._fields_ = [
     ("format", Uint32),
     ("palette", _P(SDL_Palette)),
@@ -564,36 +552,29 @@ SDL_PixelFormat._fields_ = [
 _funcdefs = [
     SDLFunc("SDL_GetPixelFormatName", [Uint32], c_char_p),
     SDLFunc("SDL_PixelFormatEnumToMasks",
-            [Uint32, _P(c_int), _P(Uint32), _P(
-                Uint32), _P(Uint32), _P(Uint32)],
-            returns=SDL_bool
-            ),
-    SDLFunc("SDL_MasksToPixelFormatEnum", [
-            c_int, Uint32, Uint32, Uint32, Uint32], Uint32),
+        [Uint32, _P(c_int), _P(Uint32), _P(Uint32), _P(Uint32), _P(Uint32)],
+        returns = SDL_bool
+    ),
+    SDLFunc("SDL_MasksToPixelFormatEnum", [c_int, Uint32, Uint32, Uint32, Uint32], Uint32),
     SDLFunc("SDL_AllocFormat", [Uint32], _P(SDL_PixelFormat)),
     SDLFunc("SDL_FreeFormat", [_P(SDL_PixelFormat)]),
     SDLFunc("SDL_AllocPalette", [c_int], _P(SDL_Palette)),
-    SDLFunc("SDL_SetPixelFormatPalette", [
-            _P(SDL_PixelFormat), _P(SDL_Palette)], c_int),
-    SDLFunc("SDL_SetPaletteColors", [
-            _P(SDL_Palette), _P(SDL_Color), c_int, c_int], c_int),
+    SDLFunc("SDL_SetPixelFormatPalette", [_P(SDL_PixelFormat), _P(SDL_Palette)], c_int),
+    SDLFunc("SDL_SetPaletteColors", [_P(SDL_Palette), _P(SDL_Color), c_int, c_int], c_int),
     SDLFunc("SDL_FreePalette", [_P(SDL_Palette)]),
     SDLFunc("SDL_MapRGB", [_P(SDL_PixelFormat), Uint8, Uint8, Uint8], Uint32),
-    SDLFunc("SDL_MapRGBA", [_P(SDL_PixelFormat),
-            Uint8, Uint8, Uint8, Uint8], Uint32),
-    SDLFunc("SDL_GetRGB", [Uint32, _P(SDL_PixelFormat),
-            _P(Uint8), _P(Uint8), _P(Uint8)]),
+    SDLFunc("SDL_MapRGBA", [_P(SDL_PixelFormat), Uint8, Uint8, Uint8, Uint8], Uint32),
+    SDLFunc("SDL_GetRGB", [Uint32, _P(SDL_PixelFormat), _P(Uint8), _P(Uint8), _P(Uint8)]),
     SDLFunc("SDL_GetRGBA",
-            [Uint32, _P(SDL_PixelFormat), _P(Uint8),
-             _P(Uint8), _P(Uint8), _P(Uint8)],
-            returns=None
-            ),
+        [Uint32, _P(SDL_PixelFormat), _P(Uint8), _P(Uint8), _P(Uint8), _P(Uint8)],
+        returns = None
+    ),
     SDLFunc("SDL_CalculateGammaRamp", [c_float, _P(Uint16)]),
 ]
 _ctypes = AttributeDict()
 for f in _funcdefs:
     _ctypes[f.name] = _bind(f.name, f.args, f.returns, f.added)
-    __all__.append(f.name)  # Add all bound functions to module namespace
+    __all__.append(f.name) # Add all bound functions to module namespace
 
 
 # Aliases for ctypes bindings
