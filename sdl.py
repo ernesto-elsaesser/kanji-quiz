@@ -20,14 +20,25 @@ SCANCODE_MAP = {
     SDL_SCANCODE_RETURN: "START",
 }
 
+JOYSTICK_MAP = {
+    0: "LEFT",
+    1: "RIGHT",
+    2: "START",
+}
 
-SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK)
+
+SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER)
 
 window = SDL_CreateWindow(b"Kanji Quiz", 0, 0, 640, 480, SDL_WINDOW_SHOWN)
 wsurf = SDL_GetWindowSurface(window)
 ww = wsurf.contents.w
 wh = wsurf.contents.h
 wrect = SDL_Rect(0, 0, ww, wh)
+
+# TODO: redundant?
+is_enabled = SDL_JoystickEventState(SDL_QUERY)
+print("SDL_JoystickEventState", is_enabled)
+SDL_JoystickEventState(SDL_ENABLE)
 
 TTF_Init()
 
@@ -58,6 +69,7 @@ game = quiz.Game(show_text)
 
 running = True
 event = SDL_Event()
+jstick = None
 
 print("START", VERSION)
 
@@ -78,6 +90,19 @@ while running:
             print("KEYUP EVENT")
         elif event.type == SDL_WINDOWEVENT:
             print("WINDOW EVENT", event.window.event)
+        elif event.type == SDL_JOYDEVICEADDED:
+            print("JDEVICE EVENT", event.jdevice.which)
+            jstick = SDL_JoystickOpen(event.jdevice.which)
+            err = SDL_GetError()
+            if err:
+                print("JOYSTICK ERROR", err)
+        elif event.type == SDL_JOYBUTTONDOWN:
+            print("JOYBUTTONDOWN EVENT")
+            button = event.jbutton.button
+            key = JOYSTICK_MAP.get(button)
+            print("- BUTTON", button, key)
+            if key is not None:
+                game.press(key)
         elif event.type == SDL_QUIT:
             print("QUIT EVENT")
             running = False
