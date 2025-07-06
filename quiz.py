@@ -113,13 +113,18 @@ class Game:
             texts.append((120, correct_kanji, WHITE, 0.2, 0.25, 0.5))
 
             info = self.kanji_dict[correct_kanji]
-            on = "、".join(info["ons"][:3])
-            kun = "、".join(info["kuns"][:3])
-            pinyin = ", ".join(info["pinyins"][:3])
 
-            texts.append((22, pinyin, DIM_WHITE, 0.4, 0.15, 0.0))
-            texts.append((22, on, WHITE, 0.4, 0.25, 0.0))
-            texts.append((22, kun, WHITE, 0.4, 0.35, 0.0))
+            if len(info["pinyins"]):
+                pinyin = ", ".join(info["pinyins"][:3])
+                texts.append((22, pinyin, DIM_WHITE, 0.4, 0.15, 0.0))
+
+            if len(info["ons"]):
+                on = "、".join(info["ons"][:3])
+                texts.append((22, on, WHITE, 0.4, 0.25, 0.0))
+
+            if len(info["kuns"]):
+                kun = "、".join(info["kuns"][:3])
+                texts.append((22, kun, WHITE, 0.4, 0.35, 0.0))
 
             texts.append((28, "+", WHITE, 0.5, 0.7, 0.5))
 

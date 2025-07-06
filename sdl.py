@@ -1,11 +1,10 @@
-import time
 import ctypes
 from pysdl import *
 from pysdl.sdlttf import *
 import quiz
 
 
-VERSION = 9
+VERSION = 10
 FONT_PATH = b"DejaVuSansMono.ttf"
 
 SCANCODE_MAP = {
@@ -33,14 +32,12 @@ JBUTTON_MAP = {
     2: "X",
     3: "Y",
     7: "START",
-    # 6 = SELECT
-    # 8 = MENU
-    # 11 = POWER?
+    # 6: SELECT
+    # 8: MENU
 }
 
 
-# TODO: remove SDL_INIT_GAMECONTROLLER?
-SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER)
+SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK)
 
 window = SDL_CreateWindow(b"Kanji Quiz", 0, 0, 640, 480, SDL_WINDOW_SHOWN)
 wsurf = SDL_GetWindowSurface(window)
