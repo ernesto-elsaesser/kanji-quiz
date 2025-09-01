@@ -23,7 +23,7 @@ class Game:
         self.show_text = show_text
         self.set_index = 0
         self.vocab = {}
-        self.decoys = ""
+        self.kanjis = {}
         self.word = None
         self.left_options = []
         self.right_options = []
@@ -43,29 +43,32 @@ class Game:
                 self.set_index += 1
             elif key == "START":
                 self.load_set()
-                self.next_question()
+                self.next_round()
 
             self.set_index %= len(SUBSETS)
+
         else:
 
-            if key == "UP":
-                self.left_pick = 2
-            if key == "LEFT":
-                self.left_pick = 1
-            if key == "RIGHT":
-                self.left_pick = 0
-            if key == "DOWN":
-                self.left_pick = 3
-            if key == "X":
-                self.right_pick = 2
-            if key == "Y":
-                self.right_pick = 1
-            if key == "A":
-                self.right_pick = 0
-            if key == "B":
-                self.right_pick = 3
             if key == "START":
                 self.word = None
+            elif self.resolve:
+                self.next_round()
+            elif key == "UP":
+                self.left_pick = 2
+            elif key == "LEFT":
+                self.left_pick = 1
+            elif key == "RIGHT":
+                self.left_pick = 0
+            elif key == "DOWN":
+                self.left_pick = 3
+            elif key == "X":
+                self.right_pick = 2
+            elif key == "Y":
+                self.right_pick = 1
+            elif key == "A":
+                self.right_pick = 0
+            elif key == "B":
+                self.right_pick = 3
 
             if self.left_pick is not None and self.right_pick is not None:
                 self.resolve = True
@@ -76,22 +79,24 @@ class Game:
 
         levels = SUBSETS[self.set_index][1]
         self.vocab = {}
-        self.decoys = ""
+        self.kanjis = {}
         for level in levels:
             self.vocab.update(jukugo.WORDS[level])
-            self.decoys += jlpt.KANJIS[level]
+            self.kanjis.update(jlpt.KANJIS[level])
 
-    def next_question(self):
+    def next_round(self):
 
         words = list(self.vocab)
 
         self.word = random.choice(words)
         self.left_pick = None
         self.right_pick = None
+        self.resolve = False
 
-        # TODO: prevent duplicates
-        self.left_options = [self.word[0]] + random.sample(self.decoys, 3)
-        self.right_options = [self.word[1]] + random.sample(self.decoys, 3)
+        others = [k for k in self.kanjis if k not in self.word]
+        decoys = random.sample(others, 6)
+        self.left_options = [self.word[0]] + decoys[:3]
+        self.right_options = [self.word[1]] + decoys[3:]
         random.shuffle(self.left_options)
         random.shuffle(self.right_options)
 
@@ -108,13 +113,22 @@ class Game:
 
         else:
 
-            reading, *meanings = self.vocab[self.word]
+            reading, *translations = self.vocab[self.word]
 
-            texts.append((20, meanings[0], WHITE, 0.5, 0.15, 0.5))
+            lines = translations[0].split(" (")
+            if len(lines) > 1:
+                texts.append((22, lines[0], WHITE, 0.5, 0.1, 0.5))
+                texts.append((18, "(" + lines[1], WHITE, 0.5, 0.18, 0.5))
+            else:
+                texts.append((22, lines[0], WHITE, 0.5, 0.15, 0.5))
 
             if self.resolve:
                 texts.append((20, reading, WHITE, 0.5, 0.72, 0.5))
                 texts.append((40, self.word, WHITE, 0.5, 0.85, 0.5))
+                for i, wp in enumerate((0.2, 0.8)):
+                    meanings = self.kanjis[self.word[i]]
+                    font_size = 16 if len(meanings) > 12 else 20
+                    texts.append((font_size, meanings, WHITE, wp, 0.85, 0.5))
 
             left_kanji, right_kanji = self.word
 
@@ -153,7 +167,7 @@ class Game:
                 else:
                     return (255, 0, 0)
             else:
-                return (128, 128, 255)
+                return (255, 255, 0)
         elif self.resolve and correct:
             return (0, 255, 0)
         else:
