@@ -49,7 +49,7 @@ def add_set(name: str, include):
 for grade_num in range(1, 7):
     add_set(f"GRADE {grade_num}", lambda k, i: i["grade"] == str(grade_num))
 
-for jlpt_level in range(6):
+for jlpt_level in range(1, 6):
     add_set(f"JLPT N{jlpt_level}", lambda k, i: i["jlpt"] == jlpt_level)
 
 add_set("NUMBERS", lambda k, _: k in NUMBERS)
