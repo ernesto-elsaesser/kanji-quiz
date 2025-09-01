@@ -1,13 +1,19 @@
-import os
-import json
 import random
-import sets
+
+import jlpt
+import jukugo
 
 
+KANJI_FONT_SIZE = 32
 WHITE = (200, 200, 200)
-DIM_WHITE = (150, 150, 150)
-RED = (255, 0, 0)
-GREEN = (0, 255, 0)
+
+SUBSETS = [
+    ("JLPT N5", ["N5"]),
+    ("JLPT N4", ["N4", "N5"]),
+    ("JLPT N3", ["N3", "N4", "N5"]),
+    ("JLPT N2", ["N2", "N3", "N4"]),
+    ("JLPT N1", ["N1", "N2", "N3"]),
+]
 
 
 class Game:
@@ -15,18 +21,21 @@ class Game:
     def __init__(self, show_text):
 
         self.show_text = show_text
-        self.set_names = list(sets.SETS)
         self.set_index = 0
-        self.kanji_dict = {}
-        self.questions = None
-        self.selected = None
-        self.frames_to_next = None
+        self.vocab = {}
+        self.decoys = ""
+        self.word = None
+        self.left_options = []
+        self.right_options = []
+        self.left_pick = None
+        self.right_pick = None
+        self.resolve = False
 
         self.draw()
 
     def press(self, key):
 
-        if self.questions is None:
+        if self.word is None:
 
             if key == "LEFT":
                 self.set_index -= 1
@@ -34,116 +43,118 @@ class Game:
                 self.set_index += 1
             elif key == "START":
                 self.load_set()
+                self.next_question()
 
-            self.set_index %= len(self.set_names)
+            self.set_index %= len(SUBSETS)
         else:
 
-            correct = self.questions[0][1]
-
-            if key in {"X", "UP"}:
-                self.selected = 2
-            if key in {"Y", "LEFT"}:
-                self.selected = 1
-            if key in {"A", "RIGHT"}:
-                self.selected = 0
-            if key in {"B", "DOWN"}:
-                self.selected = 3
+            if key == "UP":
+                self.left_pick = 2
+            if key == "LEFT":
+                self.left_pick = 1
+            if key == "RIGHT":
+                self.left_pick = 0
+            if key == "DOWN":
+                self.left_pick = 3
+            if key == "X":
+                self.right_pick = 2
+            if key == "Y":
+                self.right_pick = 1
+            if key == "A":
+                self.right_pick = 0
+            if key == "B":
+                self.right_pick = 3
             if key == "START":
-                self.questions = None
+                self.word = None
 
-            if self.selected == correct:
-                self.frames_to_next = 4
-
-        self.draw()
-
-    def tick(self):
-
-        if self.frames_to_next is not None:
-            if self.frames_to_next == 0:
-                self.frames_to_next = None
-                self.next_question()
-            else:
-                self.frames_to_next -= 1
-
-    def next_question(self):
-
-        self.selected = None
-
-        if self.questions is not None:
-            self.questions.pop(0)
-            if len(self.questions) == 0:
-                self.questions = None
+            if self.left_pick is not None and self.right_pick is not None:
+                self.resolve = True
 
         self.draw()
 
     def load_set(self):
 
-        self.kanji_dict = sets.SETS[self.set_names[self.set_index]]
+        levels = SUBSETS[self.set_index][1]
+        self.vocab = {}
+        self.decoys = ""
+        for level in levels:
+            self.vocab.update(jukugo.WORDS[level])
+            self.decoys += jlpt.KANJIS[level]
 
-        kanjis = list(self.kanji_dict)
-        random.shuffle(kanjis)
+    def next_question(self):
 
-        self.questions = []
-        for kanji in kanjis:
-            answers = [kanji]
-            while len(answers) < 4:
-                decoy = random.choice(kanjis)
-                if decoy not in answers:
-                    answers.append(decoy)
-            random.shuffle(answers)
-            lengths = {k: len(self.kanji_dict[k]["meaning"]) for k in answers}
-            answers = sorted(answers, key=lengths.__getitem__)
-            correct = answers.index(kanji)
-            self.questions.append((answers, correct))
+        words = list(self.vocab)
+
+        self.word = random.choice(words)
+        self.left_pick = None
+        self.right_pick = None
+
+        # TODO: prevent duplicates
+        self.left_options = [self.word[0]] + random.sample(self.decoys, 3)
+        self.right_options = [self.word[1]] + random.sample(self.decoys, 3)
+        random.shuffle(self.left_options)
+        random.shuffle(self.right_options)
+
+        self.draw()
 
     def draw(self):
 
         texts = []
 
-        if self.questions is None:
+        if self.word is None:
 
-            set_name = "< " + self.set_names[self.set_index] + " >"
+            set_name = "< " + SUBSETS[self.set_index][0] + " >"
             texts.append((50, set_name, WHITE, 0.5, 0.5, 0.5))
 
         else:
 
-            answers, correct = self.questions[0]
+            reading, *meanings = self.vocab[self.word]
 
-            correct_kanji = answers[correct]
-            texts.append((120, correct_kanji, WHITE, 0.2, 0.25, 0.5))
+            texts.append((20, meanings[0], WHITE, 0.5, 0.15, 0.5))
 
-            info = self.kanji_dict[correct_kanji]
+            if self.resolve:
+                texts.append((20, reading, WHITE, 0.5, 0.72, 0.5))
+                texts.append((40, self.word, WHITE, 0.5, 0.85, 0.5))
 
-            if len(info["pinyins"]):
-                pinyin = ", ".join(info["pinyins"][:3])
-                texts.append((22, pinyin, DIM_WHITE, 0.4, 0.15, 0.0))
+            left_kanji, right_kanji = self.word
 
-            if len(info["ons"]):
-                on = "、".join(info["ons"][:3])
-                texts.append((22, on, WHITE, 0.4, 0.25, 0.0))
-
-            if len(info["kuns"]):
-                kun = "、".join(info["kuns"][:3])
-                texts.append((22, kun, WHITE, 0.4, 0.35, 0.0))
-
-            texts.append((28, "+", WHITE, 0.5, 0.7, 0.5))
-
-            answer_coords = [
-                (0.57, 0.7, 0.0),
-                (0.43, 0.7, 1.0),
-                (0.5, 0.55, 0.5),
-                (0.5, 0.85, 0.5),
+            left_cross = [
+                (0.3, 0.5, 0.5),
+                (0.1, 0.5, 0.5),
+                (0.2, 0.35, 0.5),
+                (0.2, 0.65, 0.5),
             ]
 
-            for i, option_kanji in enumerate(answers):
-                info = self.kanji_dict[option_kanji]
-                meaning = info["meaning"].upper()
-                color = WHITE
-                if i == self.selected:
-                    if i == correct:
-                        color = GREEN
-                    else:
-                        color = RED
-                texts.append((28, meaning, color, *answer_coords[i]))
+            right_cross = [
+                (0.9, 0.5, 0.5),
+                (0.7, 0.5, 0.5),
+                (0.8, 0.35, 0.5),
+                (0.8, 0.65, 0.5),
+            ]
+
+            texts.append((KANJI_FONT_SIZE, "+", WHITE, 0.2, 0.5, 0.5))
+            for i, kanji in enumerate(self.left_options):
+                color = self.get_color(kanji == left_kanji, i == self.left_pick)
+                texts.append((KANJI_FONT_SIZE, kanji, color, *left_cross[i]))
+            
+            texts.append((KANJI_FONT_SIZE, "+", WHITE, 0.8, 0.5, 0.5))
+            for i, kanji in enumerate(self.right_options):
+                color = self.get_color(kanji == right_kanji, i == self.right_pick)
+                texts.append((KANJI_FONT_SIZE, kanji, color, *right_cross[i]))
 
         self.show_text(texts)
+
+    def get_color(self, correct, picked):
+
+        if picked:
+            if self.resolve:
+                if correct:
+                    return (0, 255, 0)
+                else:
+                    return (255, 0, 0)
+            else:
+                return (128, 128, 255)
+        elif self.resolve and correct:
+            return (0, 255, 0)
+        else:
+            return WHITE

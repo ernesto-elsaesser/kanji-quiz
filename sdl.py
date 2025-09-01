@@ -127,7 +127,6 @@ while running:
             print("OTHER EVENT", event.type)
 
     SDL_Delay(100)
-    game.tick()
 
 print("EXIT")
 SDL_DestroyWindow(window)

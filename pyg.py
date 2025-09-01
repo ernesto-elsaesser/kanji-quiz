@@ -71,6 +71,5 @@ while running:
                 function_pressed = False
 
     pygame.time.Clock().tick(10)
-    game.tick()
 
 pygame.quit()
