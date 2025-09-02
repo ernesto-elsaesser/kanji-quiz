@@ -5,7 +5,7 @@ APPS_DIR="/mnt/mmc/Roms/APPS"
 GAME_DIR="$APPS_DIR/quiz"
 
 {
-    echo "$(date)"
+    echo "$(LC_ALL=en_US.utf8 date)"
     mkdir -p "$GAME_DIR"
     echo "mkdir $?"
     cp "$SOURCE_DIR/quiz.py" "$GAME_DIR/"
