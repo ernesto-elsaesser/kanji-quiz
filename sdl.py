@@ -29,8 +29,8 @@ JHAT_MAP = {
 JBUTTON_MAP = {
     0: "A",
     1: "B",
-    2: "X",
-    3: "Y",
+    2: "Y",
+    3: "X",
     7: "START",
     # 6: SELECT
     # 8: MENU
